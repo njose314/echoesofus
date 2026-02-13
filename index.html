@@ -1,230 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super-Love</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chrono-Kiss: The Finale</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Dancing+Script:wght@700&display=swap');
 
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #111;
-            font-family: 'Montserrat', sans-serif;
-            touch-action: none;
-        }
+    :root {
+        --neon-pink: #ff0055;
+        --neon-blue: #00f3ff;
+        --bg-dark: #050505;
+    }
 
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #2a2a2a 0%, #000000 100%);
-        }
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: var(--bg-dark);
+        font-family: 'Orbitron', sans-serif;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
 
-        canvas {
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
-        }
+    #game-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
 
-        /* UI & Overlays */
-        #ui-layer {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #ff0055;
-            font-weight: 800;
-            font-size: 24px;
-            text-shadow: 2px 2px 0px #fff;
-            z-index: 10;
-            pointer-events: none;
-        }
+    canvas {
+        display: block;
+        filter: contrast(1.2) brightness(1.1);
+    }
 
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            text-align: center;
-            z-index: 20;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+    /* --- UI OVERLAYS --- */
+    .ui-layer {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
 
-        .hidden { display: none !important; }
+    /* HUD */
+    #hud {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        text-align: left;
+        pointer-events: none;
+    }
+    .score-label {
+        font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 2px;
+    }
+    #score-display {
+        font-size: 36px; color: var(--neon-pink); font-weight: 900;
+        text-shadow: 0 0 10px var(--neon-pink);
+    }
 
-        h1 { font-weight: 800; font-size: 40px; margin: 0; color: #ff0055; text-transform: uppercase; letter-spacing: 2px;}
-        h2 { font-weight: 800; font-size: 28px; color: #fff; margin-bottom: 10px;}
-        p { font-size: 16px; line-height: 1.6; max-width: 500px; color: #ddd;}
+    /* SCREENS */
+    .screen {
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(10px);
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        transition: opacity 0.5s;
+        pointer-events: auto;
+    }
+    .hidden { opacity: 0; pointer-events: none; }
 
-        button {
-            background: #ff0055; border: none; padding: 15px 40px;
-            color: white; font-family: 'Montserrat', sans-serif; font-weight: 800;
-            font-size: 18px; margin-top: 30px; cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            transition: transform 0.2s, background 0.2s;
-        }
-        button:hover { transform: scale(1.05); background: #ff3377;}
-        button:active { transform: scale(0.95); }
+    h1 {
+        font-size: 48px; color: white; text-transform: uppercase;
+        letter-spacing: 4px; margin: 0;
+        background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: glitch 3s infinite;
+    }
+    
+    p { color: #aaa; max-width: 80%; text-align: center; line-height: 1.6; }
 
-        #insight-message {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-left: 4px solid #ff0055;
-            font-style: italic;
-            margin-top: 20px;
-        }
+    .btn {
+        margin-top: 40px;
+        padding: 20px 60px;
+        background: transparent;
+        border: 2px solid var(--neon-pink);
+        color: white;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: 0.3s;
+        box-shadow: 0 0 15px var(--neon-pink);
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn::before {
+        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+        background: var(--neon-pink); transition: 0.3s; z-index: -1;
+    }
+    .btn:hover::before { left: 0; }
 
-    </style>
+    /* --- THE ENVELOPE REVEAL (The "Kiss Day" Mechanic) --- */
+    #letter-overlay {
+        background: rgba(0,0,0,0.85);
+        z-index: 200;
+        display: none; /* Flex when active */
+    }
+    
+    .envelope-container {
+        width: 300px;
+        height: 200px;
+        background: #eee;
+        border-radius: 10px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 50px var(--neon-pink);
+        transform: scale(0);
+        animation: popIn 0.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .wax-seal {
+        width: 60px; height: 60px;
+        background: #d00000;
+        border-radius: 50%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 30px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 10;
+        transition: transform 0.2s;
+    }
+    .wax-seal:active { transform: scale(0.9); }
+
+    .letter-paper {
+        width: 90%; height: 90%;
+        background: #fff0f5;
+        position: absolute;
+        top: 5%;
+        border-radius: 5px;
+        padding: 20px;
+        box-sizing: border-box;
+        font-family: 'Dancing Script', cursive;
+        color: #d00000;
+        font-size: 24px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: 0.5s;
+    }
+
+    .letter-paper.open {
+        opacity: 1;
+        transform: translateY(0);
+        z-index: 20;
+    }
+
+    .tap-hint {
+        position: absolute; bottom: -40px; color: white; font-size: 12px; opacity: 0.5;
+        animation: blink 2s infinite;
+    }
+
+    /* Animations */
+    @keyframes glitch {
+        0% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); }
+        90% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); }
+        92% { text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-blue); transform: translate(2px, -2px); }
+        94% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); transform: translate(-2px, 2px); }
+        100% { transform: translate(0); }
+    }
+    @keyframes popIn { to { transform: scale(1); } }
+    @keyframes blink { 50% { opacity: 1; } }
+
+    /* Scanlines */
+    .scanlines {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background-size: 100% 4px, 6px 100%;
+        pointer-events: none;
+        z-index: 50;
+    }
+</style>
 </head>
 <body>
 
 <div id="game-container">
     <canvas id="gameCanvas"></canvas>
-    <div id="ui-layer">NOTES: <span id="score">0</span> / 10</div>
+    
+    <div class="scanlines"></div>
 
-    <div id="start-screen" class="overlay">
-        <h1>SUPER-LOVE</h1>
-        <p style="font-weight: 800; color: #ff0055; margin-top: 0;">Time only moves when you move.</p>
-        <p>The world is chaotic and fast.<br>Stop moving to slow it down and breathe.</p>
-        <p>Collect 10 Love Notes to win.<br>Avoid the red shapes.</p>
-        <button onclick="startGame()">INITIALIZE</button>
+    <div id="hud">
+        <div class="score-label">LOVE LETTERS</div>
+        <div id="score-display">0/10</div>
     </div>
 
-    <div id="win-screen" class="overlay hidden">
-        <h1>HAPPY VALENTINE'S DAY</h1>
-        <h2>MISSION COMPLETE</h2>
-        <div id="insight-message">
-            "Life feels like this game sometimes—chaotic, fast, and full of noise flying at us. But when I'm with you, the noise fades. You are my ability to slow down time, find clarity, and focus on the beautiful things that matter. You are my Super-Love."
+    <div id="start-screen" class="screen">
+        <h1>CHRONO KISS</h1>
+        <p>TIME MOVES WHEN YOU MOVE.</p>
+        <p>Collect 10 💌 Envelopes to win her heart.<br>Avoid the Glitch Shards.</p>
+        <button class="btn" id="start-btn">INITIALIZE LOVE</button>
+    </div>
+
+    <div id="win-screen" class="screen hidden">
+        <h1 style="font-size: 40px;">FOREVER YOURS</h1>
+        <p style="font-size: 18px; color: white; margin-top: 20px;">
+            "Just like this game, no matter how chaotic life gets,<br>
+            I will always slow down time to find you."
+        </p>
+        <div style="font-family: 'Dancing Script', cursive; font-size: 30px; color: var(--neon-pink); margin: 30px;">
+            Happy Valentine's Day
         </div>
-        <button onclick="resetGame()">PLAY AGAIN</button>
+        <button class="btn" onclick="location.reload()">REPLAY MEMORY</button>
+    </div>
+
+    <div id="letter-overlay" class="screen hidden">
+        <div class="envelope-container" id="envelope">
+            <div class="wax-seal" id="seal">💋</div>
+            <div class="letter-paper" id="letter-text">
+                </div>
+        </div>
+        <div class="tap-hint">Tap to save note & resume</div>
     </div>
 </div>
 
 <script>
-// ===========================
-// FLIRTY LINES REPOSITORY (200 Lines)
-// ===========================
-const flirtyLines = [
-    "Time stops for you.", "You paused my world.", "Chaos looks good on you.", "Are you a time traveler?", "My heart beats faster when you move.",
-    "You're the glitch I love.", "System overload: You.", "Catch me if you can.", "Worth the risk.", "Slow down, beautiful.",
-    "You're my favorite distraction.", "I'd dodge bullets for you.", "Did it hurt when you fell from time?", "Focus on me.", "You make time irrelevant.",
-    "Let's rewrite history.", "My future looks like you.", "Dangerous curves ahead.", "Stay right there.", "Moving fast, falling hard.",
-    // ... (Filling to ~200 for the mechanic to work robustly) ...
-    "You're mesmerizing.", "Can't take my eyes off you.", "Electricity when we touch.", "You're my clarity.", "Find me in the noise.",
-    "Just you and me.", "Forget the world.", "Look at me.", "Breathe in.", "Closer.", "Not that close ;)", "You got this.", "Impressive moves.",
-    "I like your style.", "Keep going.", "Almost there.", "Don't stop now.", "You're doing great.", "My champion.", "Hey good lookin'.",
-    "What's your hurry?", "Stay a while.", "Lost in your eyes.", "Pure magic.", "You're charging my battery.", "High voltage love.",
-    "You're the only thing I see.", "Everything else is blur.", "Sharp focus on you.", "My favorite notification.", "You're my priority.",
-    "Searching for signal... found you.", "Connection established.", "Downloading your heart.", "Upload complete.", "Syncing with you.",
-    "Are you real?", "Too good to be true.", "Dreaming with eyes open.", "Pinch me.", "Wake up next to me.", "Good morning beautiful.",
-    "Sweet dreams.", "Thinking of you.", "Always on my mind.", "Can't stop smiling.", "You make me happy.", "You're my sunshine.",
-    "You light up the room.", "Star power.", "Galaxy brain connection.", "Out of this world.", "Universal truth: Us.",
-    "Destiny calling.", "Fate brought us here.", "Written in the stars.", "Lucky me.", "Jackpot.", "Winning lottery ticket.",
-    "Best prize ever.", "Trophy partner.", "First place in my heart.", "Gold medal love.", "Record breaking.",
-    "Unstoppable.", "Bulletproof love.", "Nothing can hurt us.", "Safe with me.", "I've got your back.", "Team us.",
-    "Partners in crime.", "Ride or die.", "My better half.", "Completing the puzzle.", "Missing piece found.",
-    "Perfect fit.", "Like a glove.", "Meant to be.", "Soulmate stuff.", "Twin flames.", "Burning bright.",
-    "On fire.", "Hot stuff.", "Sizzling.", "Spicy.", "Sweetheart.", "Honey.", "Darling.", "My love.", "Babe.",
-    "Gorgeous.", "Stunning.", "Beautiful.", "Handsome.", "Cute.", "Adorable.", "Lovely.", "Charming.",
-    "Witty.", "Smart.", "Funny.", "You make me laugh.", "Joy bringer.", "Peace maker.", "Comfort zone.",
-    "Home is you.", "My safe space.", "Sanctuary.", "Haven.", "Refuge.", "Shelter from the storm.",
-    "Calm in the chaos.", "Eye of the storm.", "Steady hand.", "Rock solid.", "Foundation.", "Cornerstone.",
-    "Key to my heart.", "Unlocked.", "Open sesame.", "Secret treasure.", "Hidden gem.", "Rare find.",
-    "One of a kind.", "Limited edition.", "Exclusive.", "VIP access only.", "Velvet rope.", "Red carpet.",
-    "Star treatment.", "Spoiling you.", "You deserve the best.", "Queen.", "King.", "Royalty.",
-    "Ruling my world.", "Boss.", "Captain.", "Pilot.", "Navigator.", "Guiding star.", "North star.",
-    "Compass.", "Direction.", "Pathfinder.", "Trailblazer.", "Trendsetter.", "Icon.", "Legend.",
-    "Epic.", "Saga.", "Story of us.", "Chapter one.", "To be continued...", "Happily ever after.",
-    "Fairy tale.", "Magic carpet ride.", "Whole new world.", "Adventure awaits.", "Let's explore.",
-    "Discovering you.", "Uncharted territory.", "Wild side.", "Untamed.", "Free spirit.",
-    "Wild heart.", "Rebel.", "Rule breaker.", "Trouble maker.", "But the good kind.",
-    "Cheeky.", "Playful.", "Fun.", "Exciting.", "Thrilling.", "Adrenaline rush.",
-    "Heart pounding.", "Breathless.", "Gasp.", "Wow.", "Just... wow."
+/**
+ * --- REPOSITORY OF 200 FLIRTY LINES ---
+ * A mix of romantic, cheesy, dev-humor, and spicy lines.
+ */
+const LOVE_DB = [
+    // 1-50: Romantic & Sweet
+    "You are my favorite notification.", "Time stops when I look at you.", "You feel like home.", 
+    "My heart beats in 120fps for you.", "You are the CSS to my HTML.", "I'd never Ctrl+Z our memories.",
+    "You are my logic in a chaotic world.", "My love for you is an infinite loop.", "You had me at 'Hello World'.",
+    "No bug can break what we have.", "You are my production environment.", "I want to commit to you.",
+    "You are the only variable I need.", "Let's merge our branches.", "You are high priority.",
+    "My system crashes without you.", "You're the admin of my heart.", "Access granted: Always.",
+    "You make my dopamine overflow.", "I'm compiled to love you.", "You are my best feature.",
+    "No lag when I'm with you.", "You're 100% my type.", "I'm stuck in your orbit.", "Gravity points to you.",
+    "You shine brighter than neon.", "My compass points to you.", "You are my safe house.",
+    "Level 100 Boss of beauty.", "I'd pause my game for you.", "You are the ultimate loot.",
+    "My player 2 forever.", "Game over? Never with you.", "You unlock my best self.",
+    "I'm buffering... staring at you.", "You are 4K resolution in a 720p world.", "High fidelity love.",
+    "You have the key to my server.", "My firewall is down for you.", "Encrypt me with your love.",
+    "You are my source code.", "I'm running on your energy.", "You optimize my life.",
+    "Garbage collection deleted my exes.", "You are the master branch.", "Deploying hugs...",
+    "Executing kiss.exe...", "Runtime error: Too hot to handle.", "You are my GUI.",
+    // 51-100: Playful & Spicy
+    "Are you a keyboard? You're my type.", "Do you believe in love at first byte?", "Your smile is my favorite UI.",
+    "Let's make some memories.", "You're dangerous.", "Dangerously beautiful.", "I surrender.",
+    "Take my heart, it's open source.", "You've hacked my mind.", "Malware? No, just love.",
+    "I'm infected by you.", "Quarantine me with you.", "Social distancing? Not from you.",
+    "You are the glitch I love.", "Break the rules with me.", "Let's cause some trouble.",
+    "You look illegal today.", "Arrest me, officer.", "Guilty of loving you.",
+    "Stolen heart reported.", "Suspect: You.", "Verdict: Forever.", "Sentence: Life with me.",
+    "Escaping reality with you.", "Virtual reality is nothing compared to you.", "Touch me.",
+    "Haptic feedback enabled.", "Vibrating with love.", "Shocking.", "Electric.",
+    "Sparks flying.", "Short circuit.", "Overload.", "System failure: Too much love.",
+    "Rebooting...", "Restarting heart...", "Bios check: All systems go.", "Login successful.",
+    "Welcome home.", "User settings: Loved.", "Preferences: You.", "Favorites: You.",
+    "History: Us.", "Cookies: Accepted.", "Cache: Cleared for you.", "Bandwidth: All yours.",
+    "Download speed: Fast.", "Upload speed: Infinite.", "Cloud 9.", "Sky high.",
+    // 101-150: The Mechanic (Time/Motion specific)
+    "Time flies when we kiss.", "Slow down, enjoy the view.", "Fast forward to us.", "Rewind? No regrets.",
+    "Pause. Kiss. Play.", "Stop the clock.", "Timeless beauty.", "Eternal flame.",
+    "Seconds feel like hours without you.", "Hours feel like seconds with you.", "Time traveler?",
+    "Future looks bright.", "Past is history.", "Present is a gift.", "Unwrap me.",
+    "Motion blur.", "Speed of light.", "Warp speed.", "Teleport to me.", "Beam me up.",
+    "Star crossed.", "Galactic love.", "Universal truth.", "Big Bang.", "Supernova.",
+    "Black hole eyes.", "Event horizon.", "No escape.", "Singularity.", "Parallel universe.",
+    "In every timeline, I choose you.", "Multiverse theory: We win.", "Quantum entanglement.",
+    "Spooky action at a distance.", "Relativity.", "E=mc^2 (Energy = My Cutie^2).",
+    "Physics broken.", "Chemistry perfect.", "Biology matched.", "Math adds up.",
+    "Calculated risk.", "Probability: 100%.", "Statistics don't lie.", "Data says yes.",
+    "Analysis complete.", "Result: Soulmates.", "Conclusion: Marry me.", "Hypothesis proved.",
+    "Experiment success.", "Peer reviewed.", "Published.", "Cited by everyone.",
+    // 151-200: Short & Punchy
+    "Kiss me.", "Hold me.", "Love you.", "Adore you.", "Want you.", "Need you.",
+    "Miss you.", "Crave you.", "Yours.", "Mine.", "Ours.", "Forever.", "Always.",
+    "Infinity.", "Beyond.", "Plus ultra.", "Max power.", "Full hearts.", "Health 100%.",
+    "Shields up.", "Armor off.", "Vulnerable.", "Trust.", "Faith.", "Hope.", "Joy.",
+    "Peace.", "Calm.", "Storm.", "Rain.", "Sun.", "Moon.", "Stars.", "Sky.",
+    "Ocean.", "Deep.", "Vast.", "Wild.", "Free.", "Fly.", "Soar.", "Drift.",
+    "Race.", "Run.", "Walk.", "Stay.", "Sit.", "Be.", "Here.", "Now."
 ];
 
-// ===========================
-// AUDIO ENGINE (Synthesizer)
-// ===========================
+/**
+ * --- AUDIO ENGINE (THE UNLOCKER) ---
+ */
 const Audio = {
     ctx: null,
-    masterGain: null,
-    droneOsc: null,
-    droneGain: null,
+    master: null,
+    drone: null,
+    filter: null,
     isInit: false,
-    
+
     init: function() {
-        if(this.isInit) return;
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.connect(this.ctx.destination);
-        this.masterGain.gain.value = 0.3; // Master volume
+        if (this.isInit) return;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AC();
+        
+        // Master Chain
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.4;
+        this.master.connect(this.ctx.destination);
 
-        // Setup Drone (Bass)
-        this.droneOsc = this.ctx.createOscillator();
-        this.droneOsc.type = 'sawtooth';
-        this.droneOsc.frequency.setValueAtTime(55, this.ctx.currentTime); // Low A
-        this.droneGain = this.ctx.createGain();
-        this.droneGain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-        this.droneOsc.connect(this.droneGain);
-        this.droneGain.connect(this.masterGain);
-        this.droneOsc.start();
+        // Filter (Lowpass for underwater feel when slow)
+        this.filter = this.ctx.createBiquadFilter();
+        this.filter.type = 'lowpass';
+        this.filter.frequency.value = 500;
+        this.filter.connect(this.master);
+
+        // Drone
+        this.drone = this.ctx.createOscillator();
+        this.drone.type = 'sawtooth'; // Gritty synth
+        this.drone.frequency.value = 50; // Bass
+        this.drone.start();
+
+        // Drone Gain (Volume)
+        const dGain = this.ctx.createGain();
+        dGain.gain.value = 0.2;
+        this.drone.connect(dGain);
+        dGain.connect(this.filter);
+
         this.isInit = true;
+        
+        // Mobile Unlock
+        if (this.ctx.state === 'suspended') this.ctx.resume();
     },
 
-    updateDrone: function(timeScale) {
-        if(!this.isInit) return;
-        // Pitch up and get louder as time speeds up
-        const targetFreq = 55 + (timeScale * 110); // 55Hz to 165Hz
-        const targetVol = 0.1 + (timeScale * 0.3);
-        this.droneOsc.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
-        this.droneGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.1);
+    update: function(timeScale) {
+        if (!this.isInit) return;
+        
+        // Dynamic Filter: Opens up when time moves fast
+        const targetFreq = 100 + (timeScale * 2000); 
+        this.filter.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
+
+        // Drone Pitch: Rises with speed
+        const targetPitch = 50 + (timeScale * 50);
+        this.drone.frequency.setTargetAtTime(targetPitch, this.ctx.currentTime, 0.1);
     },
 
-    playCollect: function() {
-        if(!this.isInit) return;
+    playSfx: function(type) {
+        if (!this.isInit) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, this.ctx.currentTime); // High note
-        osc.frequency.exponentialRampToValueAtTime(1760, this.ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
         osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.3);
-    },
+        gain.connect(this.master);
 
-    playDeath: function() {
-        if(!this.isInit) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(55, this.ctx.currentTime + 0.5);
-        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.5);
+        const now = this.ctx.currentTime;
+        if (type === 'collect') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1500, now + 0.3);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.start();
+            osc.stop(now + 0.5);
+        } else if (type === 'hit') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.start();
+            osc.stop(now + 0.5);
+        }
     }
 };
 
-// ===========================
-// GAME ENGINE
-// ===========================
+/**
+ * --- GAME ENGINE ---
+ */
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-let width, height;
+const ctx = canvas.getContext('2d', { alpha: false }); // Opt for speed
 
+let width, height;
 function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
@@ -233,76 +404,370 @@ window.addEventListener('resize', resize);
 resize();
 
 // Game State
-let gameState = 'START';
+let gameState = 'MENU'; // MENU, PLAY, PAUSE_LETTER, WIN, DEAD
 let score = 0;
-let notesCollectedIdx = new Set();
-let timeScale = 0.05; // The core mechanic: Starts very slow
+let timeScale = 0.05;
+let collectedIds = new Set();
+let shake = 0;
+let frameCount = 0;
 
-// Input
-let inputPos = { x: width/2, y: height/2 };
-let isTouching = false;
-let lastInputPos = { x: width/2, y: height/2 };
+// Inputs
+let input = { x: width/2, y: height/2, active: false };
+let lastInput = { x: width/2, y: height/2 };
 
 // Entities
-const player = {
-    x: width/2, y: height/2, size: 20, color: '#ff0055',
-    trail: []
-};
+const player = { x: width/2, y: height/2, size: 15, trail: [] };
 let enemies = [];
-let notes = [];
+let pickups = []; // Envelopes
 let particles = [];
+let backgroundStars = [];
 
-// --- Input Handling (Mouse & Touch) ---
-function updateInput(x, y, touching) {
-    inputPos.x = x;
-    inputPos.y = y;
-    isTouching = touching;
+// Init Background Stars
+for(let i=0; i<100; i++) {
+    backgroundStars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * 2 + 0.5 // Depth
+    });
 }
-// Mouse
-canvas.addEventListener('mousemove', e => updateInput(e.clientX, e.clientY, true));
-canvas.addEventListener('mouseleave', e => updateInput(inputPos.x, inputPos.y, false));
-// Touch
-canvas.addEventListener('touchstart', e => {
-    e.preventDefault();
-    updateInput(e.touches[0].clientX, e.touches[0].clientY, true);
-    lastInputPos.x = inputPos.x; lastInputPos.y = inputPos.y; // Reset delta on new touch
-}, {passive: false});
-canvas.addEventListener('touchmove', e => {
-    e.preventDefault();
-    updateInput(e.touches[0].clientX, e.touches[0].clientY, true);
-}, {passive: false});
-canvas.addEventListener('touchend', e => {
-     e.preventDefault();
-     updateInput(inputPos.x, inputPos.y, false);
-});
 
+// --- UTILS ---
+function randomColor() {
+    return `hsl(${Math.random()*60 + 320}, 100%, 60%)`; // Pink/Red/Purple
+}
 
+function spawnExplosion(x, y, color) {
+    for(let i=0; i<20; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 1.0,
+            color: color || '#fff'
+        });
+    }
+}
+
+// --- CORE LOOPS ---
 function startGame() {
     Audio.init();
     document.getElementById('start-screen').classList.add('hidden');
     resetGame();
-    gameState = 'PLAYING';
-    gameLoop();
 }
 
 function resetGame() {
-    gameState = 'PLAYING';
+    gameState = 'PLAY';
     score = 0;
-    document.getElementById('score').innerText = score;
-    document.getElementById('win-screen').classList.add('hidden');
-    notesCollectedIdx.clear();
+    updateScore();
+    collectedIds.clear();
     enemies = [];
-    notes = [];
+    pickups = [];
     particles = [];
     player.x = width/2; player.y = height/2;
     player.trail = [];
-    inputPos = { x: width/2, y: height/2 };
-    lastInputPos = { x: width/2, y: height/2 };
-    timeScale = 0.05;
+    shake = 0;
     
-    // Initial Spawns
-    for(let i=0; i<10; i++) spawnEnemy();
-    spawnNote();
+    spawnPickup(); // Start with one
+    // Initial enemies
+    for(let i=0; i<5; i++) spawnEnemy();
+    
+    gameLoop();
+}
+
+function updateScore() {
+    document.getElementById('score-display').innerText = `${score}/10`;
+}
+
+function spawnEnemy() {
+    const side = Math.floor(Math.random() * 4);
+    let x, y;
+    if (side === 0) { x = Math.random() * width; y = -50; }
+    else if (side === 1) { x = width + 50; y = Math.random() * height; }
+    else if (side === 2) { x = Math.random() * width; y = height + 50; }
+    else { x = -50; y = Math.random() * height; }
+
+    enemies.push({
+        x: x, y: y,
+        vx: (Math.random() - 0.5), vy: (Math.random() - 0.5), // Drift
+        speed: 2 + Math.random() * 3,
+        size: 20 + Math.random() * 30,
+        shape: Math.random() > 0.5 ? 3 : 4, // Triangle or Square
+        angle: 0,
+        spin: (Math.random() - 0.5) * 0.1
+    });
+}
+
+function spawnPickup() {
+    pickups.push({
+        x: Math.random() * (width - 100) + 50,
+        y: Math.random() * (height - 100) + 50,
+        id: Math.floor(Math.random() * LOVE_DB.length),
+        angle: 0
+    });
+}
+
+// --- MAIN GAME LOOP ---
+function gameLoop() {
+    if (gameState === 'DEAD' || gameState === 'WIN') return;
+    
+    requestAnimationFrame(gameLoop);
+    
+    // 0. TIME DILATION LOGIC
+    // Calculate movement delta
+    let dx = input.x - lastInput.x;
+    let dy = input.y - lastInput.y;
+    let delta = Math.sqrt(dx*dx + dy*dy);
+    lastInput.x = input.x;
+    lastInput.y = input.y;
+    
+    // If input is active and moving, timeScale -> 1.0. Else -> 0.05
+    let targetTime = (input.active && delta > 1) ? 1.0 : 0.05;
+    if (gameState === 'PAUSE_LETTER') targetTime = 0; // Frozen
+    
+    // Lerp Time
+    timeScale += (targetTime - timeScale) * 0.1;
+    Audio.update(timeScale);
+
+    // 1. UPDATE & RENDER
+    // Clear with trails
+    ctx.fillStyle = `rgba(5, 5, 5, 0.4)`; // Motion blur trail
+    ctx.fillRect(0, 0, width, height);
+    
+    // Shake
+    ctx.save();
+    if (shake > 0) {
+        let s = shake * (timeScale + 0.1); // Shake feels 'heavier' in slow mo
+        ctx.translate((Math.random()-0.5)*s, (Math.random()-0.5)*s);
+        shake *= 0.9;
+    }
+
+    // A. Draw Background Grid (Warped)
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    const gridSize = 50;
+    const timeOffset = frameCount * 0.5 * timeScale;
+    
+    ctx.beginPath();
+    // Simple moving stars logic instead of expensive grid
+    backgroundStars.forEach(star => {
+        // Parallax move
+        star.y += star.z * timeScale * 2; 
+        if(star.y > height) star.y = 0;
+        
+        let size = star.z * 1.5;
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + timeScale*0.7})`;
+        ctx.fillRect(star.x, star.y, size, size);
+    });
+    ctx.stroke();
+
+    if (gameState === 'PAUSE_LETTER') {
+        // Draw everything frozen, skip updates
+        drawEntities(0); 
+        ctx.restore();
+        return;
+    }
+
+    // B. Player Logic
+    let moveSpeed = 0.15;
+    player.x += (input.x - player.x) * moveSpeed;
+    player.y += (input.y - player.y) * moveSpeed;
+    
+    // Trail
+    player.trail.push({x: player.x, y: player.y, age: 10});
+    if(player.trail.length > 20) player.trail.shift();
+    
+    // Draw Player Trail (Neon Ribbon)
+    if(player.trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(player.trail[0].x, player.trail[0].y);
+        for(let p of player.trail) ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = `rgba(0, 243, 255, 0.5)`;
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#00f3ff';
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    }
+
+    // Draw Player Core
+    ctx.fillStyle = '#fff';
+    ctx.shadowBlur = 30;
+    ctx.shadowColor = '#00f3ff';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.size/2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // C. Pickups (Envelopes)
+    pickups.forEach((p, i) => {
+        // Bobbing
+        let bob = Math.sin(frameCount * 0.1) * 5;
+        
+        // Draw Envelope Emoji or Sprite
+        ctx.font = "30px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#ff0055';
+        ctx.fillText("💌", p.x, p.y + bob);
+        ctx.shadowBlur = 0;
+
+        // Collision
+        let dist = Math.hypot(player.x - p.x, player.y - p.y);
+        if (dist < 40) {
+            triggerLetter(p);
+            pickups.splice(i, 1);
+        }
+    });
+
+    // D. Enemies
+    if (enemies.length < 15 && Math.random() < 0.05 * timeScale) spawnEnemy();
+
+    enemies.forEach((e, i) => {
+        // Move towards player
+        let angle = Math.atan2(player.y - e.y, player.x - e.x);
+        e.x += Math.cos(angle) * e.speed * timeScale;
+        e.y += Math.sin(angle) * e.speed * timeScale;
+        e.angle += e.spin * timeScale; // Rotate
+
+        // Draw Glitch Shard
+        ctx.save();
+        ctx.translate(e.x, e.y);
+        ctx.rotate(e.angle);
+        
+        // RGB Split Effect (Visual Polish)
+        let split = 5 * (1.0 - timeScale); // More split when slow
+        
+        ctx.globalCompositeOperation = 'lighter'; // Additive blending
+        
+        // Red Channel
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        drawShape(ctx, e.shape, e.size, -split, -split);
+        // Blue Channel
+        ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+        drawShape(ctx, e.shape, e.size, split, split);
+        // Core
+        ctx.fillStyle = '#ff3300';
+        drawShape(ctx, e.shape, e.size, 0, 0);
+        
+        ctx.restore();
+
+        // Collision
+        let dist = Math.hypot(player.x - e.x, player.y - e.y);
+        if (dist < (player.size + e.size)/2) {
+            Audio.playSfx('hit');
+            gameOver();
+        }
+
+        // Cleanup
+        if(e.x < -100 || e.x > width+100 || e.y < -100 || e.y > height+100) enemies.splice(i,1);
+    });
+
+    // E. Particles
+    particles.forEach((p, i) => {
+        p.x += p.vx * timeScale;
+        p.y += p.vy * timeScale;
+        p.life -= 0.02 * (timeScale + 0.1); // Decay always
+        
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.fillRect(p.x, p.y, 3, 3);
+        ctx.globalAlpha = 1;
+        
+        if (p.life <= 0) particles.splice(i, 1);
+    });
+
+    ctx.restore();
+    frameCount++;
+}
+
+// Helper to draw entities during pause
+function drawEntities(dt) {
+    // Just redraws the current state without updating positions
+    // (Simplification for this code structure: we rely on the canvas 
+    // holding the last frame or clearing with low opacity)
+}
+
+function drawShape(ctx, sides, size, offsetX, offsetY) {
+    ctx.beginPath();
+    for (let i = 0; i < sides; i++) {
+        let theta = (i / sides) * 2 * Math.PI;
+        let x = offsetX + Math.cos(theta) * size/2;
+        let y = offsetY + Math.sin(theta) * size/2;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
+// --- LETTER MECHANIC ---
+function triggerLetter(pickup) {
+    // 1. Pause Game
+    gameState = 'PAUSE_LETTER';
+    Audio.playSfx('collect');
+    
+    // 2. Logic
+    score++;
+    updateScore();
+    
+    // 3. UI Reveal
+    const overlay = document.getElementById('letter-overlay');
+    const envelope = document.getElementById('envelope');
+    const paper = document.getElementById('letter-text');
+    const seal = document.getElementById('seal');
+    
+    // Reset Animation
+    overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
+    paper.classList.remove('open');
+    paper.innerHTML = ""; // clear text
+    seal.style.transform = "scale(1)";
+    
+    // Handle Touch to Open
+    seal.onclick = function(e) {
+        e.stopPropagation();
+        seal.style.transform = "scale(1.5)";
+        setTimeout(() => {
+            seal.style.transform = "scale(0)"; // Poof
+            paper.classList.add('open');
+            
+            // Typewriter Effect
+            const text = LOVE_DB[pickup.id] || "You are my favorite error.";
+            let charIndex = 0;
+            const typeInterval = setInterval(() => {
+                paper.textContent += text.charAt(charIndex);
+                charIndex++;
+                if(charIndex >= text.length) clearInterval(typeInterval);
+            }, 30); // Speed of typing
+        }, 200);
+    };
+
+    // Handle Tap Anywhere to Resume (Only if opened)
+    overlay.onclick = function() {
+        if (paper.classList.contains('open')) {
+            overlay.classList.add('hidden');
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
+            gameState = 'PLAY';
+            
+            // Spawn next pickup or Win
+            if (score >= 10) {
+                setTimeout(winGame, 1000);
+            } else {
+                spawnPickup();
+            }
+        }
+    };
+}
+
+function gameOver() {
+    gameState = 'DEAD';
+    shake = 20;
+    setTimeout(() => {
+        resetGame(); // Instant restart
+    }, 500);
 }
 
 function winGame() {
@@ -310,215 +775,31 @@ function winGame() {
     document.getElementById('win-screen').classList.remove('hidden');
 }
 
-function gameOver() {
-    Audio.playDeath();
-    resetGame(); // Instant restart for "just one more try" feel
-}
+// --- INPUT HANDLING ---
+const handleInput = (x, y, active) => {
+    input.x = x; input.y = y; input.active = active;
+};
 
-// --- Spawning Logic ---
-function spawnEnemy() {
-    const side = Math.floor(Math.random() * 4);
-    let x, y;
-    // Spawn outside screen
-    if(side === 0) { x = Math.random() * width; y = -50; } // Top
-    else if(side === 1) { x = width + 50; y = Math.random() * height; } // Right
-    else if(side === 2) { x = Math.random() * width; y = height + 50; } // Bottom
-    else { x = -50; y = Math.random() * height; } // Left
+// Touch
+document.addEventListener('touchstart', e => {
+    e.preventDefault();
+    handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
+}, {passive: false});
+document.addEventListener('touchmove', e => {
+    e.preventDefault();
+    handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
+}, {passive: false});
+document.addEventListener('touchend', () => {
+    input.active = false;
+});
 
-    enemies.push({
-        x: x, y: y,
-        size: 15 + Math.random() * 20,
-        speed: 2 + Math.random() * 3,
-        angle: 0
-    });
-}
+// Mouse
+document.addEventListener('mousemove', e => handleInput(e.clientX, e.clientY, true));
+document.addEventListener('mousedown', () => input.active = true);
+document.addEventListener('mouseup', () => input.active = false);
 
-function spawnNote() {
-    let lineIdx;
-    do {
-        lineIdx = Math.floor(Math.random() * flirtyLines.length);
-    } while (notesCollectedIdx.has(lineIdx) && notesCollectedIdx.size < flirtyLines.length);
-
-    notes.push({
-        x: Math.random() * (width - 100) + 50,
-        y: Math.random() * (height - 100) + 50,
-        text: flirtyLines[lineIdx],
-        id: lineIdx,
-        size: 16,
-        life: 500 // Despawn eventually
-    });
-}
-
-function spawnParticles(x, y) {
-    for(let i=0; i<15; i++) {
-        particles.push({
-            x: x, y: y,
-            vx: (Math.random() - 0.5) * 10,
-            vy: (Math.random() - 0.5) * 10,
-            life: 1.0,
-            color: `hsl(${Math.random()*50 + 330}, 100%, 60%)` // Pink/Red range
-        });
-    }
-}
-
-// --- Main Loop ---
-function gameLoop() {
-    if(gameState !== 'PLAYING') {
-        if(gameState === 'WIN') Audio.updateDrone(0); // Silence drone on win
-        requestAnimationFrame(gameLoop);
-        return;
-    }
-
-    ctx.clearRect(0, 0, width, height);
-
-    // 1. CALCULATE TIME SCALE based on input movement distance
-    let dx = inputPos.x - lastInputPos.x;
-    let dy = inputPos.y - lastInputPos.y;
-    let inputDelta = Math.sqrt(dx*dx + dy*dy);
-    
-    // Target time scale: if moving fast, target 1.0. If still, target 0.05.
-    let targetTimeScale = (inputDelta > 2 || !isTouching) ? 0.05 : 1.0;
-    // If touch just started or ended, snap a bit faster
-    if(!isTouching) targetTimeScale = 0.05;
-
-    // Smoothly interpolate current timeScale towards target
-    timeScale += (targetTimeScale - timeScale) * 0.15;
-
-    // Update last position for next frame
-    lastInputPos.x = inputPos.x;
-    lastInputPos.y = inputPos.y;
-    
-    // Update Audio Drone based on time speed
-    Audio.updateDrone(timeScale);
-
-    // 2. UPDATE PLAYER (Moves towards input)
-    let moveSpeed = 0.2;
-    player.x += (inputPos.x - player.x) * moveSpeed;
-    player.y += (inputPos.y - player.y) * moveSpeed;
-    
-    // Player Trail
-    player.trail.push({x: player.x, y: player.y});
-    if(player.trail.length > 15) player.trail.shift();
-
-    // 3. UPDATE ENEMIES (Affected by TimeScale)
-    if(enemies.length < 15) {
-        if(Math.random() < 0.02 * timeScale) spawnEnemy();
-    }
-    
-    enemies.forEach((e, i) => {
-        // Move towards player
-        let angle = Math.atan2(player.y - e.y, player.x - e.x);
-        e.x += Math.cos(angle) * e.speed * timeScale;
-        e.y += Math.sin(angle) * e.speed * timeScale;
-        e.angle += 0.05 * timeScale; // Rotation
-
-        // Collision with Player
-        let dist = Math.hypot(player.x - e.x, player.y - e.y);
-        if(dist < player.size/2 + e.size/2) {
-            gameOver();
-        }
-        // Cleanup offscreen
-        if(e.x < -100 || e.x > width+100 || e.y < -100 || e.y > height+100) enemies.splice(i,1);
-    });
-
-    // 4. UPDATE NOTES
-    if(notes.length < 3 && Math.random() < 0.01 * timeScale) spawnNote();
-    
-    notes.forEach((n, i) => {
-        n.life -= timeScale;
-        n.y += Math.sin(Date.now()/500 + i) * 0.5 * timeScale; // Gentle float
-
-        // Collision with Player (Collection)
-        let dist = Math.hypot(player.x - n.x, player.y - n.y);
-        // Generous collision radius for text
-        if(dist < player.size + 30) {
-            Audio.playCollect();
-            spawnParticles(n.x, n.y);
-            score++;
-            document.getElementById('score').innerText = score;
-            notesCollectedIdx.add(n.id);
-            notes.splice(i, 1);
-            if(score >= 10) winGame();
-        }
-        if(n.life <= 0) notes.splice(i, 1);
-    });
-
-
-    // 5. DRAW (With Polished Visuals)
-    
-    // Chromatic Aberration Effect based on slow time
-    let aber = (1.0 - timeScale) * 5; 
-
-    // Draw Trail
-    ctx.beginPath();
-    ctx.moveTo(player.trail[0].x, player.trail[0].y);
-    for(let i=1; i<player.trail.length; i++) ctx.lineTo(player.trail[i].x, player.trail[i].y);
-    ctx.strokeStyle = 'rgba(255, 0, 85, 0.4)';
-    ctx.lineWidth = player.size;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // Draw Player Heart
-    drawHeart(player.x, player.y, player.size, player.color);
-
-    // Draw Enemies (Red Shapes with aberration)
-    enemies.forEach(e => {
-        ctx.save();
-        ctx.translate(e.x, e.y);
-        ctx.rotate(e.angle);
-        
-        // Fake Chromatic Aberration layers
-        ctx.globalCompositeOperation = 'screen';
-        ctx.fillStyle = 'rgba(255,0,0,0.5)';
-        ctx.fillRect(-e.size/2 - aber, -e.size/2, e.size, e.size);
-        ctx.fillStyle = 'rgba(0,255,255,0.5)';
-        ctx.fillRect(-e.size/2 + aber, -e.size/2, e.size, e.size);
-        
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = '#cc0000';
-        ctx.fillRect(-e.size/2, -e.size/2, e.size, e.size);
-        ctx.restore();
-    });
-
-    // Draw Notes
-    ctx.textAlign = 'center';
-    ctx.font = '700 16px Montserrat';
-    notes.forEach(n => {
-        let opacity = Math.min(1, n.life / 50);
-        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-        ctx.shadowColor = '#ff0055';
-        ctx.shadowBlur = 10;
-        ctx.fillText(n.text, n.x, n.y);
-        ctx.shadowBlur = 0;
-    });
-
-    // Draw Particles
-    particles.forEach((p, i) => {
-        p.x += p.vx; p.y += p.vy; p.life -= 0.02;
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life;
-        drawHeart(p.x, p.y, 8 * p.life, p.color);
-        ctx.globalAlpha = 1;
-        if(p.life <= 0) particles.splice(i, 1);
-    });
-
-    requestAnimationFrame(gameLoop);
-}
-
-// Helper function to draw a heart shape
-function drawHeart(x, y, size, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(x, y + size / 4);
-    ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
-    ctx.bezierCurveTo(x - size / 2, y + size / 2, x, y + size * 0.75, x, y + size);
-    ctx.bezierCurveTo(x, y + size * 0.75, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
-    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
-    ctx.fill();
-}
-
-// Prevent default touch behaviors like scrolling
-document.addEventListener('touchmove', {passive: false});
+// Init Button
+document.getElementById('start-btn').addEventListener('click', startGame);
 
 </script>
 </body>
