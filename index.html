@@ -3,22 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Chrono-Kiss: The Finale</title>
+<title>Falling For You</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Dancing+Script:wght@700&display=swap');
-
-    :root {
-        --neon-pink: #ff0055;
-        --neon-blue: #00f3ff;
-        --bg-dark: #050505;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     body {
         margin: 0;
         overflow: hidden;
-        background-color: var(--bg-dark);
-        font-family: 'Orbitron', sans-serif;
-        touch-action: none;
+        background-color: #121212;
+        font-family: 'Press Start 2P', cursive;
+        touch-action: none; /* Prevents zooming/scrolling on mobile */
         user-select: none;
         -webkit-user-select: none;
     }
@@ -27,179 +21,93 @@
         position: relative;
         width: 100vw;
         height: 100vh;
-        overflow: hidden;
+        background: #121212;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     canvas {
-        display: block;
-        filter: contrast(1.2) brightness(1.1);
+        image-rendering: pixelated; /* Sharp pixels */
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
     }
 
-    /* --- UI OVERLAYS --- */
-    .ui-layer {
+    /* UI Overlay */
+    #ui {
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
         pointer-events: none;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 10;
+        justify-content: space-between;
+        padding: 20px;
+        box-sizing: border-box;
     }
 
-    /* HUD */
-    #hud {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        text-align: left;
-        pointer-events: none;
-    }
-    .score-label {
-        font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 2px;
-    }
-    #score-display {
-        font-size: 36px; color: var(--neon-pink); font-weight: 900;
-        text-shadow: 0 0 10px var(--neon-pink);
+    .hud-text {
+        color: white;
+        text-shadow: 2px 2px #ff0055;
+        font-size: 14px;
+        line-height: 1.5;
     }
 
-    /* SCREENS */
-    .screen {
-        background: rgba(5, 5, 5, 0.95);
-        backdrop-filter: blur(10px);
-        width: 100%; height: 100%;
+    #start-screen {
         position: absolute;
-        top: 0; left: 0;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(18, 18, 18, 0.95);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         z-index: 100;
-        transition: opacity 0.5s;
         pointer-events: auto;
     }
-    .hidden { opacity: 0; pointer-events: none; }
 
     h1 {
-        font-size: 48px; color: white; text-transform: uppercase;
-        letter-spacing: 4px; margin: 0;
-        background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: glitch 3s infinite;
-    }
-    
-    p { color: #aaa; max-width: 80%; text-align: center; line-height: 1.6; }
-
-    .btn {
-        margin-top: 40px;
-        padding: 20px 60px;
-        background: transparent;
-        border: 2px solid var(--neon-pink);
-        color: white;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 18px;
-        font-weight: 700;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        transition: 0.3s;
-        box-shadow: 0 0 15px var(--neon-pink);
-    }
-    .btn:active { transform: scale(0.95); }
-    .btn::before {
-        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-        background: var(--neon-pink); transition: 0.3s; z-index: -1;
-    }
-    .btn:hover::before { left: 0; }
-
-    /* --- THE ENVELOPE REVEAL (The "Kiss Day" Mechanic) --- */
-    #letter-overlay {
-        background: rgba(0,0,0,0.85);
-        z-index: 200;
-        display: none; /* Flex when active */
-    }
-    
-    .envelope-container {
-        width: 300px;
-        height: 200px;
-        background: #eee;
-        border-radius: 10px;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 0 50px var(--neon-pink);
-        transform: scale(0);
-        animation: popIn 0.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .wax-seal {
-        width: 60px; height: 60px;
-        background: #d00000;
-        border-radius: 50%;
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        cursor: pointer;
-        z-index: 10;
-        transition: transform 0.2s;
-    }
-    .wax-seal:active { transform: scale(0.9); }
-
-    .letter-paper {
-        width: 90%; height: 90%;
-        background: #fff0f5;
-        position: absolute;
-        top: 5%;
-        border-radius: 5px;
-        padding: 20px;
-        box-sizing: border-box;
-        font-family: 'Dancing Script', cursive;
-        color: #d00000;
-        font-size: 24px;
+        color: #ff0055;
         text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: 0.5s;
+        font-size: 24px;
+        line-height: 1.5;
+        margin-bottom: 30px;
+        text-shadow: 4px 4px #fff;
     }
 
-    .letter-paper.open {
-        opacity: 1;
-        transform: translateY(0);
-        z-index: 20;
+    button {
+        background: #fff;
+        border: 4px solid #ff0055;
+        color: #ff0055;
+        font-family: 'Press Start 2P', cursive;
+        padding: 20px 40px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.1s;
+        box-shadow: 0 6px #88002d;
+    }
+    button:active {
+        transform: translateY(6px);
+        box-shadow: 0 0 #88002d;
     }
 
-    .tap-hint {
-        position: absolute; bottom: -40px; color: white; font-size: 12px; opacity: 0.5;
-        animation: blink 2s infinite;
+    #controls-hint {
+        color: #666;
+        font-size: 10px;
+        margin-top: 20px;
+        text-align: center;
+        line-height: 1.6;
     }
 
-    /* Animations */
-    @keyframes glitch {
-        0% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); }
-        90% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); }
-        92% { text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-blue); transform: translate(2px, -2px); }
-        94% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue); transform: translate(-2px, 2px); }
-        100% { transform: translate(0); }
-    }
-    @keyframes popIn { to { transform: scale(1); } }
-    @keyframes blink { 50% { opacity: 1; } }
-
-    /* Scanlines */
-    .scanlines {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        background-size: 100% 4px, 6px 100%;
-        pointer-events: none;
+    /* Mobile Controls Overlay */
+    #mobile-controls {
+        position: absolute;
+        bottom: 0; left: 0; width: 100%; height: 100%;
         z-index: 50;
+        display: none; /* Enabled via JS on touch */
     }
+    .touch-zone { position: absolute; height: 100%; }
+    #zone-left { left: 0; width: 30%; background: rgba(255,255,255,0.0); }
+    #zone-right { right: 0; width: 30%; background: rgba(255,255,255,0.0); }
+    #zone-fire { left: 30%; width: 40%; background: rgba(255,0,85,0.0); }
+
 </style>
 </head>
 <body>
@@ -207,185 +115,84 @@
 <div id="game-container">
     <canvas id="gameCanvas"></canvas>
     
-    <div class="scanlines"></div>
-
-    <div id="hud">
-        <div class="score-label">LOVE LETTERS</div>
-        <div id="score-display">0/10</div>
+    <div id="ui">
+        <div class="hud-text">DEPTH: <span id="depth">0</span>m</div>
+        <div class="hud-text" style="text-align: right;">HP: <span id="hp">❤❤❤</span></div>
     </div>
 
-    <div id="start-screen" class="screen">
-        <h1>CHRONO KISS</h1>
-        <p>TIME MOVES WHEN YOU MOVE.</p>
-        <p>Collect 10 💌 Envelopes to win her heart.<br>Avoid the Glitch Shards.</p>
-        <button class="btn" id="start-btn">INITIALIZE LOVE</button>
+    <div id="mobile-controls">
+        <div id="zone-left" class="touch-zone"></div>
+        <div id="zone-fire" class="touch-zone"></div>
+        <div id="zone-right" class="touch-zone"></div>
     </div>
 
-    <div id="win-screen" class="screen hidden">
-        <h1 style="font-size: 40px;">FOREVER YOURS</h1>
-        <p style="font-size: 18px; color: white; margin-top: 20px;">
-            "Just like this game, no matter how chaotic life gets,<br>
-            I will always slow down time to find you."
-        </p>
-        <div style="font-family: 'Dancing Script', cursive; font-size: 30px; color: var(--neon-pink); margin: 30px;">
-            Happy Valentine's Day
+    <div id="start-screen">
+        <h1>FALLING<br>FOR YOU</h1>
+        <button id="start-btn">JUMP IN</button>
+        <div id="controls-hint">
+            DESKTOP: Arrows to Move, SPACE to Shoot<br>
+            MOBILE: Sides to Move, Center to Shoot
         </div>
-        <button class="btn" onclick="location.reload()">REPLAY MEMORY</button>
-    </div>
-
-    <div id="letter-overlay" class="screen hidden">
-        <div class="envelope-container" id="envelope">
-            <div class="wax-seal" id="seal">💋</div>
-            <div class="letter-paper" id="letter-text">
-                </div>
-        </div>
-        <div class="tap-hint">Tap to save note & resume</div>
     </div>
 </div>
 
 <script>
 /**
- * --- REPOSITORY OF 200 FLIRTY LINES ---
- * A mix of romantic, cheesy, dev-humor, and spicy lines.
- */
-const LOVE_DB = [
-    // 1-50: Romantic & Sweet
-    "You are my favorite notification.", "Time stops when I look at you.", "You feel like home.", 
-    "My heart beats in 120fps for you.", "You are the CSS to my HTML.", "I'd never Ctrl+Z our memories.",
-    "You are my logic in a chaotic world.", "My love for you is an infinite loop.", "You had me at 'Hello World'.",
-    "No bug can break what we have.", "You are my production environment.", "I want to commit to you.",
-    "You are the only variable I need.", "Let's merge our branches.", "You are high priority.",
-    "My system crashes without you.", "You're the admin of my heart.", "Access granted: Always.",
-    "You make my dopamine overflow.", "I'm compiled to love you.", "You are my best feature.",
-    "No lag when I'm with you.", "You're 100% my type.", "I'm stuck in your orbit.", "Gravity points to you.",
-    "You shine brighter than neon.", "My compass points to you.", "You are my safe house.",
-    "Level 100 Boss of beauty.", "I'd pause my game for you.", "You are the ultimate loot.",
-    "My player 2 forever.", "Game over? Never with you.", "You unlock my best self.",
-    "I'm buffering... staring at you.", "You are 4K resolution in a 720p world.", "High fidelity love.",
-    "You have the key to my server.", "My firewall is down for you.", "Encrypt me with your love.",
-    "You are my source code.", "I'm running on your energy.", "You optimize my life.",
-    "Garbage collection deleted my exes.", "You are the master branch.", "Deploying hugs...",
-    "Executing kiss.exe...", "Runtime error: Too hot to handle.", "You are my GUI.",
-    // 51-100: Playful & Spicy
-    "Are you a keyboard? You're my type.", "Do you believe in love at first byte?", "Your smile is my favorite UI.",
-    "Let's make some memories.", "You're dangerous.", "Dangerously beautiful.", "I surrender.",
-    "Take my heart, it's open source.", "You've hacked my mind.", "Malware? No, just love.",
-    "I'm infected by you.", "Quarantine me with you.", "Social distancing? Not from you.",
-    "You are the glitch I love.", "Break the rules with me.", "Let's cause some trouble.",
-    "You look illegal today.", "Arrest me, officer.", "Guilty of loving you.",
-    "Stolen heart reported.", "Suspect: You.", "Verdict: Forever.", "Sentence: Life with me.",
-    "Escaping reality with you.", "Virtual reality is nothing compared to you.", "Touch me.",
-    "Haptic feedback enabled.", "Vibrating with love.", "Shocking.", "Electric.",
-    "Sparks flying.", "Short circuit.", "Overload.", "System failure: Too much love.",
-    "Rebooting...", "Restarting heart...", "Bios check: All systems go.", "Login successful.",
-    "Welcome home.", "User settings: Loved.", "Preferences: You.", "Favorites: You.",
-    "History: Us.", "Cookies: Accepted.", "Cache: Cleared for you.", "Bandwidth: All yours.",
-    "Download speed: Fast.", "Upload speed: Infinite.", "Cloud 9.", "Sky high.",
-    // 101-150: The Mechanic (Time/Motion specific)
-    "Time flies when we kiss.", "Slow down, enjoy the view.", "Fast forward to us.", "Rewind? No regrets.",
-    "Pause. Kiss. Play.", "Stop the clock.", "Timeless beauty.", "Eternal flame.",
-    "Seconds feel like hours without you.", "Hours feel like seconds with you.", "Time traveler?",
-    "Future looks bright.", "Past is history.", "Present is a gift.", "Unwrap me.",
-    "Motion blur.", "Speed of light.", "Warp speed.", "Teleport to me.", "Beam me up.",
-    "Star crossed.", "Galactic love.", "Universal truth.", "Big Bang.", "Supernova.",
-    "Black hole eyes.", "Event horizon.", "No escape.", "Singularity.", "Parallel universe.",
-    "In every timeline, I choose you.", "Multiverse theory: We win.", "Quantum entanglement.",
-    "Spooky action at a distance.", "Relativity.", "E=mc^2 (Energy = My Cutie^2).",
-    "Physics broken.", "Chemistry perfect.", "Biology matched.", "Math adds up.",
-    "Calculated risk.", "Probability: 100%.", "Statistics don't lie.", "Data says yes.",
-    "Analysis complete.", "Result: Soulmates.", "Conclusion: Marry me.", "Hypothesis proved.",
-    "Experiment success.", "Peer reviewed.", "Published.", "Cited by everyone.",
-    // 151-200: Short & Punchy
-    "Kiss me.", "Hold me.", "Love you.", "Adore you.", "Want you.", "Need you.",
-    "Miss you.", "Crave you.", "Yours.", "Mine.", "Ours.", "Forever.", "Always.",
-    "Infinity.", "Beyond.", "Plus ultra.", "Max power.", "Full hearts.", "Health 100%.",
-    "Shields up.", "Armor off.", "Vulnerable.", "Trust.", "Faith.", "Hope.", "Joy.",
-    "Peace.", "Calm.", "Storm.", "Rain.", "Sun.", "Moon.", "Stars.", "Sky.",
-    "Ocean.", "Deep.", "Vast.", "Wild.", "Free.", "Fly.", "Soar.", "Drift.",
-    "Race.", "Run.", "Walk.", "Stay.", "Sit.", "Be.", "Here.", "Now."
-];
-
-/**
- * --- AUDIO ENGINE (THE UNLOCKER) ---
+ * --- AUDIO ENGINE (SYNTHWAVE GENERATOR) ---
+ * No external files. Pure math.
  */
 const Audio = {
     ctx: null,
-    master: null,
-    drone: null,
-    filter: null,
-    isInit: false,
-
     init: function() {
-        if (this.isInit) return;
-        const AC = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AC();
-        
-        // Master Chain
-        this.master = this.ctx.createGain();
-        this.master.gain.value = 0.4;
-        this.master.connect(this.ctx.destination);
-
-        // Filter (Lowpass for underwater feel when slow)
-        this.filter = this.ctx.createBiquadFilter();
-        this.filter.type = 'lowpass';
-        this.filter.frequency.value = 500;
-        this.filter.connect(this.master);
-
-        // Drone
-        this.drone = this.ctx.createOscillator();
-        this.drone.type = 'sawtooth'; // Gritty synth
-        this.drone.frequency.value = 50; // Bass
-        this.drone.start();
-
-        // Drone Gain (Volume)
-        const dGain = this.ctx.createGain();
-        dGain.gain.value = 0.2;
-        this.drone.connect(dGain);
-        dGain.connect(this.filter);
-
-        this.isInit = true;
-        
-        // Mobile Unlock
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
         if (this.ctx.state === 'suspended') this.ctx.resume();
     },
-
-    update: function(timeScale) {
-        if (!this.isInit) return;
-        
-        // Dynamic Filter: Opens up when time moves fast
-        const targetFreq = 100 + (timeScale * 2000); 
-        this.filter.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
-
-        // Drone Pitch: Rises with speed
-        const targetPitch = 50 + (timeScale * 50);
-        this.drone.frequency.setTargetAtTime(targetPitch, this.ctx.currentTime, 0.1);
-    },
-
-    playSfx: function(type) {
-        if (!this.isInit) return;
+    playShoot: function() {
+        if (!this.ctx) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
         osc.connect(gain);
-        gain.connect(this.master);
-
-        const now = this.ctx.currentTime;
-        if (type === 'collect') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, now);
-            osc.frequency.exponentialRampToValueAtTime(1500, now + 0.3);
-            gain.gain.setValueAtTime(0.5, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            osc.start();
-            osc.stop(now + 0.5);
-        } else if (type === 'hit') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(100, now);
-            osc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
-            gain.gain.setValueAtTime(0.5, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            osc.start();
-            osc.stop(now + 0.5);
-        }
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+    },
+    playExplode: function() {
+        if (!this.ctx) return;
+        // White noise burst
+        const bufferSize = this.ctx.sampleRate * 0.2;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+        noise.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+    },
+    playJump: function() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(300, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
     }
 };
 
@@ -393,413 +200,444 @@ const Audio = {
  * --- GAME ENGINE ---
  */
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d', { alpha: false }); // Opt for speed
+const ctx = canvas.getContext('2d');
 
-let width, height;
+// Game Constants
+const GRAVITY = 0.4;
+const TERMINAL_VELOCITY = 8;
+const JUMP_FORCE = -6;
+const SHOOT_RECOIL = 3; // The "Downwell" mechanic
+const FRICTION = 0.8;
+const MOVE_SPEED = 1;
+
+// State
+let gameState = 'MENU'; // MENU, PLAY, GAMEOVER
+let score = 0;
+let hp = 3;
+let frame = 0;
+let shake = 0;
+let hitStop = 0; // Freeze frames
+
+// Camera
+let cameraY = 0;
+
+// Inputs
+const keys = { left: false, right: false, shoot: false };
+
+// Entities
+const player = {
+    x: 0, y: 0, w: 16, h: 24,
+    vx: 0, vy: 0,
+    facing: 1,
+    cooldown: 0,
+    grounded: false
+};
+
+let platforms = [];
+let enemies = [];
+let bullets = [];
+let particles = [];
+let floatyText = [];
+
+// --- INITIALIZATION ---
 function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+    // Keep a fixed aspect ratio for that retro feel, scale up
+    const aspect = window.innerWidth / window.innerHeight;
+    canvas.height = 320; // Internal resolution height
+    canvas.width = 320 * aspect;
+    if (canvas.width > 400) canvas.width = 400; // Cap width
+    
+    // CSS handles the display scaling
 }
 window.addEventListener('resize', resize);
 resize();
 
-// Game State
-let gameState = 'MENU'; // MENU, PLAY, PAUSE_LETTER, WIN, DEAD
-let score = 0;
-let timeScale = 0.05;
-let collectedIds = new Set();
-let shake = 0;
-let frameCount = 0;
+function resetGame() {
+    gameState = 'PLAY';
+    player.x = canvas.width / 2;
+    player.y = 50;
+    player.vx = 0; player.vy = 0;
+    cameraY = 0;
+    score = 0;
+    hp = 3;
+    updateHUD();
+    
+    platforms = [];
+    enemies = [];
+    bullets = [];
+    particles = [];
+    floatyText = [];
+    
+    // Initial Platform
+    platforms.push({x: canvas.width/2 - 40, y: 150, w: 80, h: 10, type: 'solid'});
+    
+    // Generate initial chunk
+    generateLevel(200);
+}
 
-// Inputs
-let input = { x: width/2, y: height/2, active: false };
-let lastInput = { x: width/2, y: height/2 };
+// --- LEVEL GENERATION ---
+let lastGenY = 200;
+function generateLevel(targetY) {
+    while (lastGenY < targetY + canvas.height) {
+        lastGenY += 60 + Math.random() * 40; // Vertical gap
+        
+        let type = Math.random();
+        
+        // 1. Solid Platforms (Safe spots)
+        if (type < 0.4) {
+            let w = 40 + Math.random() * 60;
+            let x = Math.random() * (canvas.width - w);
+            platforms.push({x, y: lastGenY, w, h: 10, type: 'solid'});
+            
+            // Maybe add enemy on top
+            if (Math.random() < 0.5) {
+                enemies.push({
+                    x: x + w/2 - 10, y: lastGenY - 20, w: 20, h: 20, 
+                    type: 'walker', vx: 1, hp: 2
+                });
+            }
+        } 
+        // 2. Destructible Blocks (The "Doubts")
+        else if (type < 0.8) {
+            let x = Math.random() * (canvas.width - 30);
+            enemies.push({
+                x: x, y: lastGenY, w: 30, h: 30, 
+                type: 'block', hp: 3
+            });
+        }
+    }
+}
 
-// Entities
-const player = { x: width/2, y: height/2, size: 15, trail: [] };
-let enemies = [];
-let pickups = []; // Envelopes
-let particles = [];
-let backgroundStars = [];
+// --- FLIRTY TEXT SYSTEM ---
+const compliments = ["CUTE!", "WOW!", "LOVE!", "SEXY!", "MINE!", "HIT!", "YES!", "HOT!", "BABY!"];
+function spawnText(x, y) {
+    let text = compliments[Math.floor(Math.random() * compliments.length)];
+    floatyText.push({x, y, text, life: 60, vy: -1});
+}
 
-// Init Background Stars
-for(let i=0; i<100; i++) {
-    backgroundStars.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        z: Math.random() * 2 + 0.5 // Depth
+// --- MAIN LOOP ---
+function loop() {
+    requestAnimationFrame(loop);
+    
+    if (gameState !== 'PLAY') return;
+
+    // Hit Stop Logic (Juice)
+    if (hitStop > 0) {
+        hitStop--;
+        return; 
+    }
+
+    // 1. UPDATE
+    // Player Physics
+    if (keys.left) player.vx -= MOVE_SPEED;
+    if (keys.right) player.vx += MOVE_SPEED;
+    player.vx *= FRICTION;
+    player.vy += GRAVITY;
+    if (player.vy > TERMINAL_VELOCITY) player.vy = TERMINAL_VELOCITY;
+
+    // Facing
+    if (keys.left) player.facing = -1;
+    if (keys.right) player.facing = 1;
+
+    // Shooting (The "Gunboots")
+    if (keys.shoot && player.cooldown <= 0) {
+        player.cooldown = 8;
+        player.vy -= SHOOT_RECOIL; // RECOIL!
+        player.vy = Math.min(player.vy, -2); // Ensure we pop up
+        
+        // Spawn Bullet
+        bullets.push({
+            x: player.x + player.w/2 - 4, y: player.y + player.h, 
+            w: 8, h: 12, vy: 12, life: 30
+        });
+        
+        // Shell Casings (Hearts)
+        particles.push({
+            x: player.x + player.w/2, y: player.y + player.h/2,
+            vx: (Math.random() - 0.5) * 4, vy: -3 - Math.random(),
+            life: 40, color: '#ff0055', type: 'heart'
+        });
+
+        Audio.playShoot();
+        shake = 2;
+    }
+    if (player.cooldown > 0) player.cooldown--;
+
+    // Move Player
+    player.x += player.vx;
+    player.y += player.vy;
+
+    // Screen Wrap
+    if (player.x < -player.w) player.x = canvas.width;
+    if (player.x > canvas.width) player.x = -player.w;
+
+    // Camera Follow (Downwell style: Camera moves down, never up)
+    let targetCamY = player.y - canvas.height * 0.3;
+    if (targetCamY > cameraY) {
+        cameraY += (targetCamY - cameraY) * 0.1;
+    }
+    
+    // Depth Score
+    score = Math.floor(player.y / 10);
+    document.getElementById('depth').innerText = score;
+    
+    // Generate Level
+    generateLevel(cameraY + canvas.height * 1.5);
+
+    // Collision: Player vs Platforms
+    player.grounded = false;
+    platforms.forEach(p => {
+        if (rectIntersect(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)) {
+            // Only land if falling
+            if (player.vy > 0 && player.y + player.h - player.vy <= p.y) {
+                player.grounded = true;
+                player.vy = 0;
+                player.y = p.y - player.h;
+                // Combo reset could go here
+            }
+        }
     });
+
+    // Bullets Logic
+    bullets.forEach((b, bi) => {
+        b.y += b.vy;
+        b.life--;
+        
+        // Bullet vs Enemy
+        enemies.forEach((e, ei) => {
+            if (rectIntersect(b.x, b.y, b.w, b.h, e.x, e.y, e.w, e.h)) {
+                e.hp--;
+                b.life = 0;
+                shake = 3;
+                createExplosion(b.x, b.y + 10, '#fff');
+                
+                if (e.hp <= 0) {
+                    enemies.splice(ei, 1);
+                    hitStop = 3; // FREEZE FRAME
+                    shake = 6;
+                    Audio.playExplode();
+                    spawnText(e.x, e.y);
+                    createExplosion(e.x + e.w/2, e.y + e.h/2, '#ff0055');
+                }
+            }
+        });
+        
+        if (b.life <= 0) bullets.splice(bi, 1);
+    });
+
+    // Enemy Logic
+    enemies.forEach(e => {
+        if (e.type === 'walker') {
+            e.x += e.vx;
+            if (e.x <= e.startX || e.x >= e.startX + 50) e.vx *= -1; // Patrolling
+        }
+        
+        // Player vs Enemy (Damage)
+        if (rectIntersect(player.x, player.y, player.w, player.h, e.x, e.y, e.w, e.h)) {
+            // Did we jump on it? (Mario style)
+            if (player.vy > 0 && player.y + player.h - player.vy <= e.y + e.h * 0.5) {
+                // Bounce
+                player.vy = -6;
+                e.hp -= 5; // Stomp kills
+                shake = 4;
+                Audio.playJump();
+                createExplosion(player.x, player.y + player.h, '#fff');
+            } else {
+                // Take Damage
+                hp--;
+                updateHUD();
+                shake = 10;
+                hitStop = 5;
+                player.vy = -5; // Knockback
+                // Invincibility frames omitted for brevity, careful!
+                enemies = enemies.filter(en => en !== e); // Remove enemy to prevent instant death loop
+                
+                if (hp <= 0) {
+                    setTimeout(() => location.reload(), 1000);
+                }
+            }
+        }
+    });
+
+    // Cleanup Offscreen
+    platforms = platforms.filter(p => p.y > cameraY - 50);
+    enemies = enemies.filter(e => e.y > cameraY - 50);
+
+    // 2. RENDER
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset
+    ctx.fillStyle = '#121212';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Apply Camera & Shake
+    let shakeX = (Math.random() - 0.5) * shake;
+    let shakeY = (Math.random() - 0.5) * shake;
+    shake *= 0.9;
+    ctx.translate(0, -cameraY + 50 + shakeY);
+    ctx.translate(shakeX, 0);
+
+    // Draw Platforms
+    ctx.fillStyle = '#fff';
+    platforms.forEach(p => {
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        // Add a little red stripe
+        ctx.fillStyle = '#ff0055';
+        ctx.fillRect(p.x, p.y, p.w, 2);
+        ctx.fillStyle = '#fff';
+    });
+
+    // Draw Enemies
+    enemies.forEach(e => {
+        if (e.type === 'block') {
+            ctx.fillStyle = '#ff0055';
+            ctx.fillRect(e.x, e.y, e.w, e.h);
+            // Angry Eyes
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(e.x + 5, e.y + 10, 5, 5);
+            ctx.fillRect(e.x + e.w - 10, e.y + 10, 5, 5);
+        } else {
+            ctx.fillStyle = '#ff4444';
+            ctx.beginPath();
+            ctx.arc(e.x + e.w/2, e.y + e.h/2, e.w/2, 0, Math.PI*2);
+            ctx.fill();
+        }
+    });
+
+    // Draw Player (The Falling Human Sprite)
+    drawPlayerSprite(ctx, player.x, player.y, player.w, player.h, player.facing, player.vy);
+
+    // Draw Bullets
+    ctx.fillStyle = '#fff';
+    bullets.forEach(b => {
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+    });
+
+    // Draw Particles
+    particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        ctx.fillStyle = p.color;
+        if (p.type === 'heart') {
+            // Simple heart shape approximation
+            ctx.fillRect(p.x, p.y, 4, 4); 
+        } else {
+            ctx.fillRect(p.x, p.y, 3, 3);
+        }
+        if (p.life <= 0) particles.splice(i, 1);
+    });
+
+    // Draw Floaty Text
+    ctx.font = '10px "Press Start 2P"';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    floatyText.forEach((t, i) => {
+        t.y += t.vy;
+        t.life--;
+        ctx.fillText(t.text, t.x, t.y);
+        if (t.life <= 0) floatyText.splice(i, 1);
+    });
+    
+    frame++;
 }
 
-// --- UTILS ---
-function randomColor() {
-    return `hsl(${Math.random()*60 + 320}, 100%, 60%)`; // Pink/Red/Purple
+// --- SPRITE DRAWER (Pixel Art Procedural) ---
+function drawPlayerSprite(ctx, x, y, w, h, facing, vy) {
+    ctx.save();
+    ctx.translate(x + w/2, y + h/2);
+    ctx.scale(facing, 1); // Flip based on direction
+    
+    // Falling Animation frame
+    let frameOffset = (vy > 2) ? Math.sin(frame * 0.5) * 2 : 0;
+    
+    // Body (White)
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-6, -8, 12, 16);
+    
+    // Head
+    ctx.fillRect(-7, -18 + frameOffset, 14, 10);
+    
+    // Legs (Flailing if falling)
+    if (Math.abs(vy) > 1) {
+        ctx.fillRect(-6, 8, 4, 6 + Math.sin(frame)*3);
+        ctx.fillRect(2, 8, 4, 6 + Math.cos(frame)*3);
+    } else {
+        ctx.fillRect(-6, 8, 4, 6);
+        ctx.fillRect(2, 8, 4, 6);
+    }
+    
+    // Arms (Holding gun boots?? No, just flailing up)
+    ctx.fillRect(-10, -6 - frameOffset, 4, 10);
+    ctx.fillRect(6, -6 - frameOffset, 4, 10);
+    
+    // Scarf/Heart (Pink)
+    ctx.fillStyle = '#ff0055';
+    ctx.fillRect(-4, -8 + frameOffset, 8, 4); // Scarf
+    
+    ctx.restore();
 }
 
-function spawnExplosion(x, y, color) {
-    for(let i=0; i<20; i++) {
+// --- HELPERS ---
+function createExplosion(x, y, color) {
+    for (let i=0; i<10; i++) {
         particles.push({
             x: x, y: y,
-            vx: (Math.random() - 0.5) * 10,
-            vy: (Math.random() - 0.5) * 10,
-            life: 1.0,
-            color: color || '#fff'
+            vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+            life: 20, color: color
         });
     }
 }
 
-// --- CORE LOOPS ---
-function startGame() {
-    Audio.init();
-    document.getElementById('start-screen').classList.add('hidden');
-    resetGame();
+function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+    return x2 < x1 + w1 && x2 + w2 > x1 && y2 < y1 + h1 && y2 + h2 > y1;
 }
 
-function resetGame() {
-    gameState = 'PLAY';
-    score = 0;
-    updateScore();
-    collectedIds.clear();
-    enemies = [];
-    pickups = [];
-    particles = [];
-    player.x = width/2; player.y = height/2;
-    player.trail = [];
-    shake = 0;
-    
-    spawnPickup(); // Start with one
-    // Initial enemies
-    for(let i=0; i<5; i++) spawnEnemy();
-    
-    gameLoop();
+function updateHUD() {
+    let hearts = "";
+    for(let i=0; i<hp; i++) hearts += "❤";
+    document.getElementById('hp').innerText = hearts;
 }
 
-function updateScore() {
-    document.getElementById('score-display').innerText = `${score}/10`;
-}
-
-function spawnEnemy() {
-    const side = Math.floor(Math.random() * 4);
-    let x, y;
-    if (side === 0) { x = Math.random() * width; y = -50; }
-    else if (side === 1) { x = width + 50; y = Math.random() * height; }
-    else if (side === 2) { x = Math.random() * width; y = height + 50; }
-    else { x = -50; y = Math.random() * height; }
-
-    enemies.push({
-        x: x, y: y,
-        vx: (Math.random() - 0.5), vy: (Math.random() - 0.5), // Drift
-        speed: 2 + Math.random() * 3,
-        size: 20 + Math.random() * 30,
-        shape: Math.random() > 0.5 ? 3 : 4, // Triangle or Square
-        angle: 0,
-        spin: (Math.random() - 0.5) * 0.1
-    });
-}
-
-function spawnPickup() {
-    pickups.push({
-        x: Math.random() * (width - 100) + 50,
-        y: Math.random() * (height - 100) + 50,
-        id: Math.floor(Math.random() * LOVE_DB.length),
-        angle: 0
-    });
-}
-
-// --- MAIN GAME LOOP ---
-function gameLoop() {
-    if (gameState === 'DEAD' || gameState === 'WIN') return;
-    
-    requestAnimationFrame(gameLoop);
-    
-    // 0. TIME DILATION LOGIC
-    // Calculate movement delta
-    let dx = input.x - lastInput.x;
-    let dy = input.y - lastInput.y;
-    let delta = Math.sqrt(dx*dx + dy*dy);
-    lastInput.x = input.x;
-    lastInput.y = input.y;
-    
-    // If input is active and moving, timeScale -> 1.0. Else -> 0.05
-    let targetTime = (input.active && delta > 1) ? 1.0 : 0.05;
-    if (gameState === 'PAUSE_LETTER') targetTime = 0; // Frozen
-    
-    // Lerp Time
-    timeScale += (targetTime - timeScale) * 0.1;
-    Audio.update(timeScale);
-
-    // 1. UPDATE & RENDER
-    // Clear with trails
-    ctx.fillStyle = `rgba(5, 5, 5, 0.4)`; // Motion blur trail
-    ctx.fillRect(0, 0, width, height);
-    
-    // Shake
-    ctx.save();
-    if (shake > 0) {
-        let s = shake * (timeScale + 0.1); // Shake feels 'heavier' in slow mo
-        ctx.translate((Math.random()-0.5)*s, (Math.random()-0.5)*s);
-        shake *= 0.9;
-    }
-
-    // A. Draw Background Grid (Warped)
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 1;
-    const gridSize = 50;
-    const timeOffset = frameCount * 0.5 * timeScale;
-    
-    ctx.beginPath();
-    // Simple moving stars logic instead of expensive grid
-    backgroundStars.forEach(star => {
-        // Parallax move
-        star.y += star.z * timeScale * 2; 
-        if(star.y > height) star.y = 0;
-        
-        let size = star.z * 1.5;
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + timeScale*0.7})`;
-        ctx.fillRect(star.x, star.y, size, size);
-    });
-    ctx.stroke();
-
-    if (gameState === 'PAUSE_LETTER') {
-        // Draw everything frozen, skip updates
-        drawEntities(0); 
-        ctx.restore();
-        return;
-    }
-
-    // B. Player Logic
-    let moveSpeed = 0.15;
-    player.x += (input.x - player.x) * moveSpeed;
-    player.y += (input.y - player.y) * moveSpeed;
-    
-    // Trail
-    player.trail.push({x: player.x, y: player.y, age: 10});
-    if(player.trail.length > 20) player.trail.shift();
-    
-    // Draw Player Trail (Neon Ribbon)
-    if(player.trail.length > 1) {
-        ctx.beginPath();
-        ctx.moveTo(player.trail[0].x, player.trail[0].y);
-        for(let p of player.trail) ctx.lineTo(p.x, p.y);
-        ctx.strokeStyle = `rgba(0, 243, 255, 0.5)`;
-        ctx.lineWidth = 10;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = '#00f3ff';
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-    }
-
-    // Draw Player Core
-    ctx.fillStyle = '#fff';
-    ctx.shadowBlur = 30;
-    ctx.shadowColor = '#00f3ff';
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.size/2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // C. Pickups (Envelopes)
-    pickups.forEach((p, i) => {
-        // Bobbing
-        let bob = Math.sin(frameCount * 0.1) * 5;
-        
-        // Draw Envelope Emoji or Sprite
-        ctx.font = "30px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = '#ff0055';
-        ctx.fillText("💌", p.x, p.y + bob);
-        ctx.shadowBlur = 0;
-
-        // Collision
-        let dist = Math.hypot(player.x - p.x, player.y - p.y);
-        if (dist < 40) {
-            triggerLetter(p);
-            pickups.splice(i, 1);
+// --- CONTROLS ---
+window.addEventListener('keydown', e => {
+    if (e.code === 'ArrowLeft') keys.left = true;
+    if (e.code === 'ArrowRight') keys.right = true;
+    if (e.code === 'Space') {
+        if (gameState === 'MENU') {
+            document.getElementById('start-btn').click();
         }
-    });
-
-    // D. Enemies
-    if (enemies.length < 15 && Math.random() < 0.05 * timeScale) spawnEnemy();
-
-    enemies.forEach((e, i) => {
-        // Move towards player
-        let angle = Math.atan2(player.y - e.y, player.x - e.x);
-        e.x += Math.cos(angle) * e.speed * timeScale;
-        e.y += Math.sin(angle) * e.speed * timeScale;
-        e.angle += e.spin * timeScale; // Rotate
-
-        // Draw Glitch Shard
-        ctx.save();
-        ctx.translate(e.x, e.y);
-        ctx.rotate(e.angle);
-        
-        // RGB Split Effect (Visual Polish)
-        let split = 5 * (1.0 - timeScale); // More split when slow
-        
-        ctx.globalCompositeOperation = 'lighter'; // Additive blending
-        
-        // Red Channel
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        drawShape(ctx, e.shape, e.size, -split, -split);
-        // Blue Channel
-        ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
-        drawShape(ctx, e.shape, e.size, split, split);
-        // Core
-        ctx.fillStyle = '#ff3300';
-        drawShape(ctx, e.shape, e.size, 0, 0);
-        
-        ctx.restore();
-
-        // Collision
-        let dist = Math.hypot(player.x - e.x, player.y - e.y);
-        if (dist < (player.size + e.size)/2) {
-            Audio.playSfx('hit');
-            gameOver();
-        }
-
-        // Cleanup
-        if(e.x < -100 || e.x > width+100 || e.y < -100 || e.y > height+100) enemies.splice(i,1);
-    });
-
-    // E. Particles
-    particles.forEach((p, i) => {
-        p.x += p.vx * timeScale;
-        p.y += p.vy * timeScale;
-        p.life -= 0.02 * (timeScale + 0.1); // Decay always
-        
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life;
-        ctx.fillRect(p.x, p.y, 3, 3);
-        ctx.globalAlpha = 1;
-        
-        if (p.life <= 0) particles.splice(i, 1);
-    });
-
-    ctx.restore();
-    frameCount++;
-}
-
-// Helper to draw entities during pause
-function drawEntities(dt) {
-    // Just redraws the current state without updating positions
-    // (Simplification for this code structure: we rely on the canvas 
-    // holding the last frame or clearing with low opacity)
-}
-
-function drawShape(ctx, sides, size, offsetX, offsetY) {
-    ctx.beginPath();
-    for (let i = 0; i < sides; i++) {
-        let theta = (i / sides) * 2 * Math.PI;
-        let x = offsetX + Math.cos(theta) * size/2;
-        let y = offsetY + Math.sin(theta) * size/2;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        keys.shoot = true;
     }
-    ctx.closePath();
-    ctx.fill();
-}
-
-// --- LETTER MECHANIC ---
-function triggerLetter(pickup) {
-    // 1. Pause Game
-    gameState = 'PAUSE_LETTER';
-    Audio.playSfx('collect');
-    
-    // 2. Logic
-    score++;
-    updateScore();
-    
-    // 3. UI Reveal
-    const overlay = document.getElementById('letter-overlay');
-    const envelope = document.getElementById('envelope');
-    const paper = document.getElementById('letter-text');
-    const seal = document.getElementById('seal');
-    
-    // Reset Animation
-    overlay.classList.remove('hidden');
-    overlay.style.display = 'flex';
-    paper.classList.remove('open');
-    paper.innerHTML = ""; // clear text
-    seal.style.transform = "scale(1)";
-    
-    // Handle Touch to Open
-    seal.onclick = function(e) {
-        e.stopPropagation();
-        seal.style.transform = "scale(1.5)";
-        setTimeout(() => {
-            seal.style.transform = "scale(0)"; // Poof
-            paper.classList.add('open');
-            
-            // Typewriter Effect
-            const text = LOVE_DB[pickup.id] || "You are my favorite error.";
-            let charIndex = 0;
-            const typeInterval = setInterval(() => {
-                paper.textContent += text.charAt(charIndex);
-                charIndex++;
-                if(charIndex >= text.length) clearInterval(typeInterval);
-            }, 30); // Speed of typing
-        }, 200);
-    };
-
-    // Handle Tap Anywhere to Resume (Only if opened)
-    overlay.onclick = function() {
-        if (paper.classList.contains('open')) {
-            overlay.classList.add('hidden');
-            setTimeout(() => { overlay.style.display = 'none'; }, 500);
-            gameState = 'PLAY';
-            
-            // Spawn next pickup or Win
-            if (score >= 10) {
-                setTimeout(winGame, 1000);
-            } else {
-                spawnPickup();
-            }
-        }
-    };
-}
-
-function gameOver() {
-    gameState = 'DEAD';
-    shake = 20;
-    setTimeout(() => {
-        resetGame(); // Instant restart
-    }, 500);
-}
-
-function winGame() {
-    gameState = 'WIN';
-    document.getElementById('win-screen').classList.remove('hidden');
-}
-
-// --- INPUT HANDLING ---
-const handleInput = (x, y, active) => {
-    input.x = x; input.y = y; input.active = active;
-};
-
-// Touch
-document.addEventListener('touchstart', e => {
-    e.preventDefault();
-    handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
-}, {passive: false});
-document.addEventListener('touchmove', e => {
-    e.preventDefault();
-    handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
-}, {passive: false});
-document.addEventListener('touchend', () => {
-    input.active = false;
+});
+window.addEventListener('keyup', e => {
+    if (e.code === 'ArrowLeft') keys.left = false;
+    if (e.code === 'ArrowRight') keys.right = false;
+    if (e.code === 'Space') keys.shoot = false;
 });
 
-// Mouse
-document.addEventListener('mousemove', e => handleInput(e.clientX, e.clientY, true));
-document.addEventListener('mousedown', () => input.active = true);
-document.addEventListener('mouseup', () => input.active = false);
+// Touch controls
+document.getElementById('zone-left').addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
+document.getElementById('zone-left').addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
 
-// Init Button
-document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('zone-right').addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
+document.getElementById('zone-right').addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
+
+document.getElementById('zone-fire').addEventListener('touchstart', (e) => { 
+    e.preventDefault(); 
+    keys.shoot = true; 
+});
+document.getElementById('zone-fire').addEventListener('touchend', (e) => { 
+    e.preventDefault(); 
+    keys.shoot = false; 
+});
+
+// START
+document.getElementById('start-btn').addEventListener('click', () => {
+    Audio.init();
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('mobile-controls').style.display = 'block';
+    resetGame();
+    loop();
+});
 
 </script>
 </body>
