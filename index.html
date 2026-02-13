@@ -3,137 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Echoes of Us - Valentine's Special</title>
+    <title>Super-Love</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;800&display=swap');
 
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #0d0d15;
-            font-family: 'Press Start 2P', cursive;
-            touch-action: none; /* Prevent zoom on mobile */
+            background-color: #111;
+            font-family: 'Montserrat', sans-serif;
+            touch-action: none;
         }
 
         #game-container {
             position: relative;
-            width: 100vw;
+            width: 100%;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: radial-gradient(circle, #2a2a2a 0%, #000000 100%);
         }
 
         canvas {
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
-            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
         }
 
-        /* CRT Overlay Effect */
-        .scanlines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.1) 50%,
-                rgba(0,0,0,0.1)
-            );
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
-        .vignette {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
-            pointer-events: none;
-            z-index: 11;
-        }
-
+        /* UI & Overlays */
         #ui-layer {
             position: absolute;
             top: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: white;
-            z-index: 20;
+            left: 20px;
+            color: #ff0055;
+            font-weight: 800;
+            font-size: 24px;
+            text-shadow: 2px 2px 0px #fff;
+            z-index: 10;
             pointer-events: none;
-            text-shadow: 2px 2px #ff0055;
         }
 
-        h1 { font-size: 24px; margin-bottom: 10px; color: #fff; }
-        p { font-size: 12px; color: #aaa; margin-top: 5px; }
-
-        #controls {
-            position: absolute;
-            bottom: 30px;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 40px;
-            box-sizing: border-box;
-            z-index: 30;
-            pointer-events: auto; /* Buttons must be clickable */
-        }
-
-        .btn {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 20px;
-            user-select: none;
-            backdrop-filter: blur(5px);
-            transition: transform 0.1s;
-        }
-
-        .btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.3); }
-        
-        #start-screen, #win-screen, #fail-screen {
+        .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 13, 21, 0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 50;
+            background: rgba(0,0,0,0.85);
             color: white;
             text-align: center;
+            z-index: 20;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .hidden { display: none !important; }
-        
-        button.menu-btn {
-            background: #ff0055;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 14px;
-            margin-top: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px #990033;
-            transition: transform 0.1s;
+
+        h1 { font-weight: 800; font-size: 40px; margin: 0; color: #ff0055; text-transform: uppercase; letter-spacing: 2px;}
+        h2 { font-weight: 800; font-size: 28px; color: #fff; margin-bottom: 10px;}
+        p { font-size: 16px; line-height: 1.6; max-width: 500px; color: #ddd;}
+
+        button {
+            background: #ff0055; border: none; padding: 15px 40px;
+            color: white; font-family: 'Montserrat', sans-serif; font-weight: 800;
+            font-size: 18px; margin-top: 30px; cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            transition: transform 0.2s, background 0.2s;
         }
-        button.menu-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 #990033;
+        button:hover { transform: scale(1.05); background: #ff3377;}
+        button:active { transform: scale(0.95); }
+
+        #insight-message {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-left: 4px solid #ff0055;
+            font-style: italic;
+            margin-top: 20px;
         }
 
     </style>
@@ -142,579 +87,438 @@
 
 <div id="game-container">
     <canvas id="gameCanvas"></canvas>
-    <div class="scanlines"></div>
-    <div class="vignette"></div>
+    <div id="ui-layer">NOTES: <span id="score">0</span> / 10</div>
 
-    <div id="ui-layer">
-        <h1 id="level-title">PHASE 1: THE PAST</h1>
-        <p id="level-subtitle">Prepare the way for her...</p>
+    <div id="start-screen" class="overlay">
+        <h1>SUPER-LOVE</h1>
+        <p style="font-weight: 800; color: #ff0055; margin-top: 0;">Time only moves when you move.</p>
+        <p>The world is chaotic and fast.<br>Stop moving to slow it down and breathe.</p>
+        <p>Collect 10 Love Notes to win.<br>Avoid the red shapes.</p>
+        <button onclick="startGame()">INITIALIZE</button>
     </div>
 
-    <div id="controls">
-        <div style="display: flex; gap: 20px;">
-            <div class="btn" id="btn-left">←</div>
-            <div class="btn" id="btn-right">→</div>
+    <div id="win-screen" class="overlay hidden">
+        <h1>HAPPY VALENTINE'S DAY</h1>
+        <h2>MISSION COMPLETE</h2>
+        <div id="insight-message">
+            "Life feels like this game sometimes—chaotic, fast, and full of noise flying at us. But when I'm with you, the noise fades. You are my ability to slow down time, find clarity, and focus on the beautiful things that matter. You are my Super-Love."
         </div>
-        <div class="btn" id="btn-jump">↑</div>
-    </div>
-
-    <div id="start-screen">
-        <h1 style="color: #00f3ff; text-shadow: 2px 2px #ff0055;">ECHOES OF US</h1>
-        <p style="max-width: 600px; line-height: 1.5; padding: 20px;">
-            A Game About Timing & Trust.<br><br>
-            PHASE 1 (BLUE): Open the gates.<br>
-            PHASE 2 (PINK): Trust the path he made.<br><br>
-            Use Arrows or On-Screen Buttons.
-        </p>
-        <button class="menu-btn" onclick="startGame()">START JOURNEY</button>
-    </div>
-
-    <div id="win-screen" class="hidden">
-        <h1 style="color: #ff0055;">PERFECT SYNC!</h1>
-        <p>Across time, we are one.</p>
-        <p style="font-size: 10px; margin-top: 20px; color: #888;">Happy Valentine's Day</p>
-        <button class="menu-btn" onclick="resetGame()">REPLAY LOOP</button>
-    </div>
-
-    <div id="fail-screen" class="hidden">
-        <h1>TIME PARADOX</h1>
-        <p>The path was not clear.</p>
-        <button class="menu-btn" onclick="resetGame()">REWRITE HISTORY</button>
+        <button onclick="resetGame()">PLAY AGAIN</button>
     </div>
 </div>
 
 <script>
-    /** * AUDIO ENGINE (Synthesizer)
-     * Generates all sounds on the fly. No external files.
-     */
-    const AudioEngine = {
-        ctx: null,
-        init: function() {
-            window.AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-        },
-        playTone: function(freq, type, duration, vol=0.1) {
-            if (!this.ctx) return;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start();
-            osc.stop(this.ctx.currentTime + duration);
-        },
-        playJump: function() { this.playTone(400, 'square', 0.1); },
-        playLand: function() { this.playTone(100, 'sine', 0.1, 0.2); },
-        playSwitch: function() { this.playTone(1200, 'triangle', 0.3, 0.1); },
-        playWin: function() { 
-            [0, 150, 300].forEach((delay, i) => {
-                setTimeout(() => this.playTone(600 + (i*200), 'sine', 0.5, 0.2), delay);
-            });
-        },
-        playRewind: function() {
-            // Simulated tape rewind noise
-            if (!this.ctx) return;
-            const bufferSize = this.ctx.sampleRate * 1.5;
-            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1; // White noise
-            }
-            const noise = this.ctx.createBufferSource();
-            noise.buffer = buffer;
-            const gain = this.ctx.createGain();
-            gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.5);
-            noise.connect(gain);
-            gain.connect(this.ctx.destination);
-            noise.start();
-        }
-    };
+// ===========================
+// FLIRTY LINES REPOSITORY (200 Lines)
+// ===========================
+const flirtyLines = [
+    "Time stops for you.", "You paused my world.", "Chaos looks good on you.", "Are you a time traveler?", "My heart beats faster when you move.",
+    "You're the glitch I love.", "System overload: You.", "Catch me if you can.", "Worth the risk.", "Slow down, beautiful.",
+    "You're my favorite distraction.", "I'd dodge bullets for you.", "Did it hurt when you fell from time?", "Focus on me.", "You make time irrelevant.",
+    "Let's rewrite history.", "My future looks like you.", "Dangerous curves ahead.", "Stay right there.", "Moving fast, falling hard.",
+    // ... (Filling to ~200 for the mechanic to work robustly) ...
+    "You're mesmerizing.", "Can't take my eyes off you.", "Electricity when we touch.", "You're my clarity.", "Find me in the noise.",
+    "Just you and me.", "Forget the world.", "Look at me.", "Breathe in.", "Closer.", "Not that close ;)", "You got this.", "Impressive moves.",
+    "I like your style.", "Keep going.", "Almost there.", "Don't stop now.", "You're doing great.", "My champion.", "Hey good lookin'.",
+    "What's your hurry?", "Stay a while.", "Lost in your eyes.", "Pure magic.", "You're charging my battery.", "High voltage love.",
+    "You're the only thing I see.", "Everything else is blur.", "Sharp focus on you.", "My favorite notification.", "You're my priority.",
+    "Searching for signal... found you.", "Connection established.", "Downloading your heart.", "Upload complete.", "Syncing with you.",
+    "Are you real?", "Too good to be true.", "Dreaming with eyes open.", "Pinch me.", "Wake up next to me.", "Good morning beautiful.",
+    "Sweet dreams.", "Thinking of you.", "Always on my mind.", "Can't stop smiling.", "You make me happy.", "You're my sunshine.",
+    "You light up the room.", "Star power.", "Galaxy brain connection.", "Out of this world.", "Universal truth: Us.",
+    "Destiny calling.", "Fate brought us here.", "Written in the stars.", "Lucky me.", "Jackpot.", "Winning lottery ticket.",
+    "Best prize ever.", "Trophy partner.", "First place in my heart.", "Gold medal love.", "Record breaking.",
+    "Unstoppable.", "Bulletproof love.", "Nothing can hurt us.", "Safe with me.", "I've got your back.", "Team us.",
+    "Partners in crime.", "Ride or die.", "My better half.", "Completing the puzzle.", "Missing piece found.",
+    "Perfect fit.", "Like a glove.", "Meant to be.", "Soulmate stuff.", "Twin flames.", "Burning bright.",
+    "On fire.", "Hot stuff.", "Sizzling.", "Spicy.", "Sweetheart.", "Honey.", "Darling.", "My love.", "Babe.",
+    "Gorgeous.", "Stunning.", "Beautiful.", "Handsome.", "Cute.", "Adorable.", "Lovely.", "Charming.",
+    "Witty.", "Smart.", "Funny.", "You make me laugh.", "Joy bringer.", "Peace maker.", "Comfort zone.",
+    "Home is you.", "My safe space.", "Sanctuary.", "Haven.", "Refuge.", "Shelter from the storm.",
+    "Calm in the chaos.", "Eye of the storm.", "Steady hand.", "Rock solid.", "Foundation.", "Cornerstone.",
+    "Key to my heart.", "Unlocked.", "Open sesame.", "Secret treasure.", "Hidden gem.", "Rare find.",
+    "One of a kind.", "Limited edition.", "Exclusive.", "VIP access only.", "Velvet rope.", "Red carpet.",
+    "Star treatment.", "Spoiling you.", "You deserve the best.", "Queen.", "King.", "Royalty.",
+    "Ruling my world.", "Boss.", "Captain.", "Pilot.", "Navigator.", "Guiding star.", "North star.",
+    "Compass.", "Direction.", "Pathfinder.", "Trailblazer.", "Trendsetter.", "Icon.", "Legend.",
+    "Epic.", "Saga.", "Story of us.", "Chapter one.", "To be continued...", "Happily ever after.",
+    "Fairy tale.", "Magic carpet ride.", "Whole new world.", "Adventure awaits.", "Let's explore.",
+    "Discovering you.", "Uncharted territory.", "Wild side.", "Untamed.", "Free spirit.",
+    "Wild heart.", "Rebel.", "Rule breaker.", "Trouble maker.", "But the good kind.",
+    "Cheeky.", "Playful.", "Fun.", "Exciting.", "Thrilling.", "Adrenaline rush.",
+    "Heart pounding.", "Breathless.", "Gasp.", "Wow.", "Just... wow."
+];
 
-    /**
-     * GAME ENGINE
-     */
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+// ===========================
+// AUDIO ENGINE (Synthesizer)
+// ===========================
+const Audio = {
+    ctx: null,
+    masterGain: null,
+    droneOsc: null,
+    droneGain: null,
+    isInit: false,
     
-    // Responsive Canvas
-    function resize() {
-        canvas.width = Math.min(window.innerWidth, 800);
-        canvas.height = Math.min(window.innerHeight, 600);
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    init: function() {
+        if(this.isInit) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.connect(this.ctx.destination);
+        this.masterGain.gain.value = 0.3; // Master volume
 
-    // Game Constants
-    const GRAVITY = 0.6;
-    const SPEED = 5;
-    const JUMP_FORCE = -10;
+        // Setup Drone (Bass)
+        this.droneOsc = this.ctx.createOscillator();
+        this.droneOsc.type = 'sawtooth';
+        this.droneOsc.frequency.setValueAtTime(55, this.ctx.currentTime); // Low A
+        this.droneGain = this.ctx.createGain();
+        this.droneGain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        this.droneOsc.connect(this.droneGain);
+        this.droneGain.connect(this.masterGain);
+        this.droneOsc.start();
+        this.isInit = true;
+    },
+
+    updateDrone: function(timeScale) {
+        if(!this.isInit) return;
+        // Pitch up and get louder as time speeds up
+        const targetFreq = 55 + (timeScale * 110); // 55Hz to 165Hz
+        const targetVol = 0.1 + (timeScale * 0.3);
+        this.droneOsc.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
+        this.droneGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.1);
+    },
+
+    playCollect: function() {
+        if(!this.isInit) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, this.ctx.currentTime); // High note
+        osc.frequency.exponentialRampToValueAtTime(1760, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+    },
+
+    playDeath: function() {
+        if(!this.isInit) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(55, this.ctx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.5);
+    }
+};
+
+// ===========================
+// GAME ENGINE
+// ===========================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+
+function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Game State
+let gameState = 'START';
+let score = 0;
+let notesCollectedIdx = new Set();
+let timeScale = 0.05; // The core mechanic: Starts very slow
+
+// Input
+let inputPos = { x: width/2, y: height/2 };
+let isTouching = false;
+let lastInputPos = { x: width/2, y: height/2 };
+
+// Entities
+const player = {
+    x: width/2, y: height/2, size: 20, color: '#ff0055',
+    trail: []
+};
+let enemies = [];
+let notes = [];
+let particles = [];
+
+// --- Input Handling (Mouse & Touch) ---
+function updateInput(x, y, touching) {
+    inputPos.x = x;
+    inputPos.y = y;
+    isTouching = touching;
+}
+// Mouse
+canvas.addEventListener('mousemove', e => updateInput(e.clientX, e.clientY, true));
+canvas.addEventListener('mouseleave', e => updateInput(inputPos.x, inputPos.y, false));
+// Touch
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    updateInput(e.touches[0].clientX, e.touches[0].clientY, true);
+    lastInputPos.x = inputPos.x; lastInputPos.y = inputPos.y; // Reset delta on new touch
+}, {passive: false});
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    updateInput(e.touches[0].clientX, e.touches[0].clientY, true);
+}, {passive: false});
+canvas.addEventListener('touchend', e => {
+     e.preventDefault();
+     updateInput(inputPos.x, inputPos.y, false);
+});
+
+
+function startGame() {
+    Audio.init();
+    document.getElementById('start-screen').classList.add('hidden');
+    resetGame();
+    gameState = 'PLAYING';
+    gameLoop();
+}
+
+function resetGame() {
+    gameState = 'PLAYING';
+    score = 0;
+    document.getElementById('score').innerText = score;
+    document.getElementById('win-screen').classList.add('hidden');
+    notesCollectedIdx.clear();
+    enemies = [];
+    notes = [];
+    particles = [];
+    player.x = width/2; player.y = height/2;
+    player.trail = [];
+    inputPos = { x: width/2, y: height/2 };
+    lastInputPos = { x: width/2, y: height/2 };
+    timeScale = 0.05;
     
-    // Game State
-    let gameState = 'MENU'; // MENU, PHASE1, REWIND, PHASE2, WIN, FAIL
-    let frameCount = 0;
-    let particles = [];
-    
-    // Recording Data
-    let recording = []; // Stores {x, y, grounded, etc} per frame
-    let replayIndex = 0;
+    // Initial Spawns
+    for(let i=0; i<10; i++) spawnEnemy();
+    spawnNote();
+}
 
-    // Inputs
-    const keys = { left: false, right: false, up: false };
+function winGame() {
+    gameState = 'WIN';
+    document.getElementById('win-screen').classList.remove('hidden');
+}
 
-    // Level Design (Tile Map: 1=Wall, 2=Spike, 3=SwitchA, 4=GateA, 9=Goal)
-    // A simple puzzle level
-    const TILE_SIZE = 40;
-    const levelMap = [
-        "11111111111111111111",
-        "1..................1",
-        "1..................1",
-        "1..3...............1", // Switch needs jump
-        "1.111.....444......1", // Gate blocks path
-        "1.......111111.....1",
-        "1..................1",
-        "1................9.1", // Goal
-        "1111...2222....11111", // Spikes
-        "11111111111111111111"
-    ];
+function gameOver() {
+    Audio.playDeath();
+    resetGame(); // Instant restart for "just one more try" feel
+}
 
-    // Entities
-    class Player {
-        constructor(color, isGhost = false) {
-            this.x = 80;
-            this.y = 200;
-            this.width = 30;
-            this.height = 30;
-            this.vx = 0;
-            this.vy = 0;
-            this.color = color;
-            this.grounded = false;
-            this.isGhost = isGhost;
-            
-            // Animation (Squash/Stretch)
-            this.scaleX = 1;
-            this.scaleY = 1;
-        }
+// --- Spawning Logic ---
+function spawnEnemy() {
+    const side = Math.floor(Math.random() * 4);
+    let x, y;
+    // Spawn outside screen
+    if(side === 0) { x = Math.random() * width; y = -50; } // Top
+    else if(side === 1) { x = width + 50; y = Math.random() * height; } // Right
+    else if(side === 2) { x = Math.random() * width; y = height + 50; } // Bottom
+    else { x = -50; y = Math.random() * height; } // Left
 
-        update(input) {
-            if (this.isGhost) return; // Ghost is updated by replay system
-
-            // Horizontal Movement
-            if (input.left) this.vx = -SPEED;
-            else if (input.right) this.vx = SPEED;
-            else this.vx = 0;
-
-            // Jumping
-            if (input.up && this.grounded) {
-                this.vy = JUMP_FORCE;
-                this.grounded = false;
-                this.scaleX = 0.8; this.scaleY = 1.2; // Stretch
-                AudioEngine.playJump();
-                createParticles(this.x + this.width/2, this.y + this.height, this.color);
-            }
-
-            // Physics
-            this.vy += GRAVITY;
-            this.x += this.vx;
-            this.y += this.vy;
-
-            // Collision & Recovery
-            this.handleCollisions();
-
-            // Squash recovery
-            this.scaleX += (1 - this.scaleX) * 0.1;
-            this.scaleY += (1 - this.scaleY) * 0.1;
-
-            // Bounds
-            if (this.y > canvas.height) die();
-        }
-
-        handleCollisions() {
-            this.grounded = false;
-            
-            // Check Walls/Floors
-            let tiles = getSurroundingTiles(this.x, this.y);
-            
-            tiles.forEach(tile => {
-                if (tile.type === '1' || (tile.type === '4' && tile.active)) { // 1=Wall, 4=Closed Gate
-                    // AABB Collision
-                    if (checkRectCollide(this, tile)) {
-                        resolveCollision(this, tile);
-                    }
-                }
-                // Spikes
-                if (tile.type === '2') {
-                    if (checkRectCollide(this, tile)) die();
-                }
-                // Goal
-                if (tile.type === '9' && gameState === 'PHASE2' && !this.isGhost) {
-                    if (checkRectCollide(this, tile)) winGame();
-                }
-                // Switch (Only Blue can hit)
-                if (tile.type === '3') {
-                     if (checkRectCollide(this, tile)) {
-                         toggleGate(true);
-                     }
-                }
-            });
-        }
-
-        draw() {
-            ctx.save();
-            ctx.translate(this.x + this.width/2, this.y + this.height/2);
-            ctx.scale(this.scaleX, this.scaleY);
-            
-            // Ghost Effect (Glitchy)
-            if (this.isGhost) {
-                ctx.globalAlpha = 0.5 + Math.random() * 0.2;
-                if (Math.random() > 0.9) ctx.translate(Math.random()*5, 0); // Glitch
-            }
-
-            // Draw Heart Shape
-            ctx.fillStyle = this.color;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = this.color;
-            
-            let size = this.width / 2;
-            ctx.beginPath();
-            ctx.moveTo(0, size/2);
-            ctx.bezierCurveTo(size/2, -size/2, size, 0, 0, size);
-            ctx.bezierCurveTo(-size, 0, -size/2, -size/2, 0, size/2);
-            ctx.fill();
-
-            ctx.restore();
-        }
-    }
-
-    let playerBlue = new Player('#00f3ff');
-    let playerPink = new Player('#ff0055');
-    let gateOpen = false;
-
-    // Helper Functions
-    function getSurroundingTiles(px, py) {
-        let tiles = [];
-        let startCol = Math.floor(px / TILE_SIZE);
-        let endCol = Math.floor((px + 30) / TILE_SIZE);
-        let startRow = Math.floor(py / TILE_SIZE);
-        let endRow = Math.floor((py + 30) / TILE_SIZE);
-
-        for (let r = startRow; r <= endRow; r++) {
-            for (let c = startCol; c <= endCol; c++) {
-                if (r >= 0 && r < levelMap.length && c >= 0 && c < levelMap[0].length) {
-                    let type = levelMap[r][c];
-                    if (type !== '.') {
-                        tiles.push({
-                            x: c * TILE_SIZE,
-                            y: r * TILE_SIZE,
-                            w: TILE_SIZE,
-                            h: TILE_SIZE,
-                            type: type,
-                            active: (type === '4' ? !gateOpen : true) // Gates are active (solid) if not open
-                        });
-                    }
-                }
-            }
-        }
-        return tiles;
-    }
-
-    function checkRectCollide(rect1, rect2) {
-        return (rect1.x < rect2.x + rect2.w &&
-                rect1.x + rect1.width > rect2.x &&
-                rect1.y < rect2.y + rect2.h &&
-                rect1.height + rect1.y > rect2.y);
-    }
-
-    function resolveCollision(p, t) {
-        // Simple resolution
-        let dx = (p.x + p.width/2) - (t.x + t.w/2);
-        let dy = (p.y + p.height/2) - (t.y + t.h/2);
-        let width = (p.width + t.w) / 2;
-        let height = (p.height + t.h) / 2;
-        let crossWidth = width * dy;
-        let crossHeight = height * dx;
-
-        if (Math.abs(dx) <= width && Math.abs(dy) <= height) {
-            if (crossWidth > crossHeight) {
-                if (crossWidth > -crossHeight) { // Bottom collision
-                    p.y = t.y + t.h;
-                    p.vy = 0;
-                } else { // Left collision
-                    p.x = t.x - p.width;
-                    p.vx = 0;
-                }
-            } else {
-                if (crossWidth > -crossHeight) { // Right collision
-                    p.x = t.x + t.w;
-                    p.vx = 0;
-                } else { // Top collision (Landing)
-                    p.y = t.y - p.height;
-                    p.vy = 0;
-                    p.grounded = true;
-                    // Squash
-                    if(p.vy > 2) { p.scaleX = 1.2; p.scaleY = 0.8; AudioEngine.playLand(); }
-                }
-            }
-        }
-    }
-
-    function toggleGate(state) {
-        if (gateOpen !== state) {
-            gateOpen = state;
-            AudioEngine.playSwitch();
-            // Shake screen
-            shake = 10;
-        }
-    }
-
-    function createParticles(x, y, color) {
-        for(let i=0; i<5; i++) {
-            particles.push({
-                x: x, y: y,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4,
-                life: 30,
-                color: color
-            });
-        }
-    }
-
-    // Input Handling
-    window.addEventListener('keydown', e => {
-        if(e.code === 'ArrowLeft') keys.left = true;
-        if(e.code === 'ArrowRight') keys.right = true;
-        if(e.code === 'ArrowUp' || e.code === 'Space') keys.up = true;
+    enemies.push({
+        x: x, y: y,
+        size: 15 + Math.random() * 20,
+        speed: 2 + Math.random() * 3,
+        angle: 0
     });
-    window.addEventListener('keyup', e => {
-        if(e.code === 'ArrowLeft') keys.left = false;
-        if(e.code === 'ArrowRight') keys.right = false;
-        if(e.code === 'ArrowUp' || e.code === 'Space') keys.up = false;
+}
+
+function spawnNote() {
+    let lineIdx;
+    do {
+        lineIdx = Math.floor(Math.random() * flirtyLines.length);
+    } while (notesCollectedIdx.has(lineIdx) && notesCollectedIdx.size < flirtyLines.length);
+
+    notes.push({
+        x: Math.random() * (width - 100) + 50,
+        y: Math.random() * (height - 100) + 50,
+        text: flirtyLines[lineIdx],
+        id: lineIdx,
+        size: 16,
+        life: 500 // Despawn eventually
     });
-    
-    // Touch Controls
-    const btnLeft = document.getElementById('btn-left');
-    const btnRight = document.getElementById('btn-right');
-    const btnJump = document.getElementById('btn-jump');
-    
-    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
-    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
-    
-    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
-    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
-    
-    btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); keys.up = true; });
-    btnJump.addEventListener('touchend', (e) => { e.preventDefault(); keys.up = false; });
+}
 
-    // Game Logic
-    let shake = 0;
-
-    function startGame() {
-        AudioEngine.init();
-        document.getElementById('start-screen').classList.add('hidden');
-        resetPhase1();
-    }
-
-    function resetPhase1() {
-        gameState = 'PHASE1';
-        recording = [];
-        playerBlue = new Player('#00f3ff');
-        gateOpen = false;
-        document.getElementById('level-title').innerText = "PHASE 1: THE PAST";
-        document.getElementById('level-subtitle').innerText = "Hit the switch. Open the path.";
-        document.getElementById('level-subtitle').style.color = "#00f3ff";
-    }
-
-    function startRewind() {
-        gameState = 'REWIND';
-        AudioEngine.playRewind();
-        setTimeout(() => {
-            gameState = 'PHASE2';
-            replayIndex = 0;
-            playerPink = new Player('#ff0055');
-            // IMPORTANT: Gate resets! Pink relies on Blue's echo to open it again.
-            gateOpen = false; 
-            document.getElementById('level-title').innerText = "PHASE 2: THE PRESENT";
-            document.getElementById('level-subtitle').innerText = "Follow him. Trust the timing.";
-            document.getElementById('level-subtitle').style.color = "#ff0055";
-        }, 1500);
-    }
-
-    function die() {
-        if (gameState === 'PHASE1') {
-            resetPhase1(); // Retry Phase 1
-        } else if (gameState === 'PHASE2') {
-            document.getElementById('fail-screen').classList.remove('hidden');
-        }
-    }
-
-    function winGame() {
-        gameState = 'WIN';
-        AudioEngine.playWin();
-        document.getElementById('win-screen').classList.remove('hidden');
-    }
-
-    function resetGame() {
-        document.getElementById('win-screen').classList.add('hidden');
-        document.getElementById('fail-screen').classList.add('hidden');
-        resetPhase1();
-    }
-
-    // Main Loop
-    function loop() {
-        // Clear
-        ctx.fillStyle = '#0d0d15';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Shake Effect
-        if(shake > 0) {
-            ctx.save();
-            ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
-            shake *= 0.9;
-        }
-
-        // Draw Map
-        for (let r = 0; r < levelMap.length; r++) {
-            for (let c = 0; c < levelMap[0].length; c++) {
-                let type = levelMap[r][c];
-                let x = c * TILE_SIZE;
-                let y = r * TILE_SIZE;
-
-                if (type === '1') { // Wall
-                    ctx.fillStyle = '#222';
-                    ctx.strokeStyle = '#333';
-                    ctx.lineWidth = 2;
-                    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-                } else if (type === '2') { // Spike
-                    ctx.fillStyle = '#ff0000';
-                    ctx.beginPath();
-                    ctx.moveTo(x, y + TILE_SIZE);
-                    ctx.lineTo(x + TILE_SIZE/2, y);
-                    ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE);
-                    ctx.fill();
-                } else if (type === '3') { // Switch
-                    ctx.fillStyle = gateOpen ? '#444' : '#00f3ff';
-                    ctx.shadowBlur = gateOpen ? 0 : 10;
-                    ctx.shadowColor = '#00f3ff';
-                    ctx.fillRect(x + 5, y + 20, TILE_SIZE - 10, 20);
-                    ctx.shadowBlur = 0;
-                } else if (type === '4') { // Gate
-                    if (!gateOpen) {
-                        ctx.fillStyle = '#ff9900'; // Closed color
-                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE * 3); // Tall gate
-                        // Stripes
-                        ctx.fillStyle = '#000';
-                        ctx.fillRect(x+10, y, 5, TILE_SIZE*3);
-                    } else {
-                        // Open Gate Outline
-                        ctx.strokeStyle = '#333';
-                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE * 3);
-                    }
-                } else if (type === '9') { // Goal
-                    ctx.fillStyle = '#ff0055';
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = '#ff0055';
-                    ctx.beginPath();
-                    ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, 10 + Math.sin(frameCount * 0.1)*2, 0, Math.PI*2);
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-            }
-        }
-
-        // Logic
-        if (gameState === 'PHASE1') {
-            playerBlue.update(keys);
-            playerBlue.draw();
-            
-            // Record Frame
-            recording.push({
-                x: playerBlue.x,
-                y: playerBlue.y,
-                vx: playerBlue.vx,
-                vy: playerBlue.vy,
-                scaleX: playerBlue.scaleX,
-                scaleY: playerBlue.scaleY,
-                gateState: gateOpen
-            });
-            
-            // Phase 1 End Condition (Time limit or manual trigger? Let's use reaching end of map X)
-            // Just for this demo, let's say Phase 1 ends when Blue hits the switch and survives for 2 more seconds.
-            // SIMPLER: Blue touches the Goal to "set the timeline"
-            if (checkGoal(playerBlue)) {
-                startRewind();
-            }
-
-        } else if (gameState === 'REWIND') {
-            // Visual Rewind
-            ctx.font = "30px 'Press Start 2P'";
-            ctx.fillStyle = "white";
-            ctx.fillText("REWINDING...", canvas.width/2 - 100, canvas.height/2);
-            
-            // Glitch Effect
-            if (Math.random() > 0.5) {
-                ctx.fillStyle = "rgba(0,0,0,0.5)";
-                ctx.fillRect(0,0,canvas.width, canvas.height);
-            }
-
-        } else if (gameState === 'PHASE2') {
-            // Replay Blue Ghost
-            if (replayIndex < recording.length) {
-                let frame = recording[replayIndex];
-                playerBlue.x = frame.x;
-                playerBlue.y = frame.y;
-                playerBlue.scaleX = frame.scaleX;
-                playerBlue.scaleY = frame.scaleY;
-                playerBlue.isGhost = true;
-                
-                // CRITICAL: The ghost must trigger the gate visually/logically
-                if (frame.gateState && !gateOpen) toggleGate(true); // Ghost opened it
-                
-                playerBlue.draw();
-                replayIndex++;
-            } else {
-                // Ghost ran out of time
-                playerBlue.isGhost = true;
-                playerBlue.draw(); // Just stays at last frame
-            }
-
-            // Play Pink
-            playerPink.update(keys);
-            playerPink.draw();
-        }
-
-        // Particles
-        particles.forEach((p, i) => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.life / 30;
-            ctx.fillRect(p.x, p.y, 4, 4);
-            ctx.globalAlpha = 1;
-            if (p.life <= 0) particles.splice(i, 1);
+function spawnParticles(x, y) {
+    for(let i=0; i<15; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 1.0,
+            color: `hsl(${Math.random()*50 + 330}, 100%, 60%)` // Pink/Red range
         });
+    }
+}
 
-        if(shake > 0) ctx.restore();
-
-        frameCount++;
-        requestAnimationFrame(loop);
+// --- Main Loop ---
+function gameLoop() {
+    if(gameState !== 'PLAYING') {
+        if(gameState === 'WIN') Audio.updateDrone(0); // Silence drone on win
+        requestAnimationFrame(gameLoop);
+        return;
     }
 
-    function checkGoal(p) {
-        // Goal is '9'
-        let tiles = getSurroundingTiles(p.x, p.y);
-        for(let t of tiles) {
-            if(t.type === '9' && checkRectCollide(p, t)) return true;
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. CALCULATE TIME SCALE based on input movement distance
+    let dx = inputPos.x - lastInputPos.x;
+    let dy = inputPos.y - lastInputPos.y;
+    let inputDelta = Math.sqrt(dx*dx + dy*dy);
+    
+    // Target time scale: if moving fast, target 1.0. If still, target 0.05.
+    let targetTimeScale = (inputDelta > 2 || !isTouching) ? 0.05 : 1.0;
+    // If touch just started or ended, snap a bit faster
+    if(!isTouching) targetTimeScale = 0.05;
+
+    // Smoothly interpolate current timeScale towards target
+    timeScale += (targetTimeScale - timeScale) * 0.15;
+
+    // Update last position for next frame
+    lastInputPos.x = inputPos.x;
+    lastInputPos.y = inputPos.y;
+    
+    // Update Audio Drone based on time speed
+    Audio.updateDrone(timeScale);
+
+    // 2. UPDATE PLAYER (Moves towards input)
+    let moveSpeed = 0.2;
+    player.x += (inputPos.x - player.x) * moveSpeed;
+    player.y += (inputPos.y - player.y) * moveSpeed;
+    
+    // Player Trail
+    player.trail.push({x: player.x, y: player.y});
+    if(player.trail.length > 15) player.trail.shift();
+
+    // 3. UPDATE ENEMIES (Affected by TimeScale)
+    if(enemies.length < 15) {
+        if(Math.random() < 0.02 * timeScale) spawnEnemy();
+    }
+    
+    enemies.forEach((e, i) => {
+        // Move towards player
+        let angle = Math.atan2(player.y - e.y, player.x - e.x);
+        e.x += Math.cos(angle) * e.speed * timeScale;
+        e.y += Math.sin(angle) * e.speed * timeScale;
+        e.angle += 0.05 * timeScale; // Rotation
+
+        // Collision with Player
+        let dist = Math.hypot(player.x - e.x, player.y - e.y);
+        if(dist < player.size/2 + e.size/2) {
+            gameOver();
         }
-        return false;
-    }
+        // Cleanup offscreen
+        if(e.x < -100 || e.x > width+100 || e.y < -100 || e.y > height+100) enemies.splice(i,1);
+    });
 
-    // Start loop
-    loop();
+    // 4. UPDATE NOTES
+    if(notes.length < 3 && Math.random() < 0.01 * timeScale) spawnNote();
+    
+    notes.forEach((n, i) => {
+        n.life -= timeScale;
+        n.y += Math.sin(Date.now()/500 + i) * 0.5 * timeScale; // Gentle float
+
+        // Collision with Player (Collection)
+        let dist = Math.hypot(player.x - n.x, player.y - n.y);
+        // Generous collision radius for text
+        if(dist < player.size + 30) {
+            Audio.playCollect();
+            spawnParticles(n.x, n.y);
+            score++;
+            document.getElementById('score').innerText = score;
+            notesCollectedIdx.add(n.id);
+            notes.splice(i, 1);
+            if(score >= 10) winGame();
+        }
+        if(n.life <= 0) notes.splice(i, 1);
+    });
+
+
+    // 5. DRAW (With Polished Visuals)
+    
+    // Chromatic Aberration Effect based on slow time
+    let aber = (1.0 - timeScale) * 5; 
+
+    // Draw Trail
+    ctx.beginPath();
+    ctx.moveTo(player.trail[0].x, player.trail[0].y);
+    for(let i=1; i<player.trail.length; i++) ctx.lineTo(player.trail[i].x, player.trail[i].y);
+    ctx.strokeStyle = 'rgba(255, 0, 85, 0.4)';
+    ctx.lineWidth = player.size;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Draw Player Heart
+    drawHeart(player.x, player.y, player.size, player.color);
+
+    // Draw Enemies (Red Shapes with aberration)
+    enemies.forEach(e => {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+        ctx.rotate(e.angle);
+        
+        // Fake Chromatic Aberration layers
+        ctx.globalCompositeOperation = 'screen';
+        ctx.fillStyle = 'rgba(255,0,0,0.5)';
+        ctx.fillRect(-e.size/2 - aber, -e.size/2, e.size, e.size);
+        ctx.fillStyle = 'rgba(0,255,255,0.5)';
+        ctx.fillRect(-e.size/2 + aber, -e.size/2, e.size, e.size);
+        
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#cc0000';
+        ctx.fillRect(-e.size/2, -e.size/2, e.size, e.size);
+        ctx.restore();
+    });
+
+    // Draw Notes
+    ctx.textAlign = 'center';
+    ctx.font = '700 16px Montserrat';
+    notes.forEach(n => {
+        let opacity = Math.min(1, n.life / 50);
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.shadowColor = '#ff0055';
+        ctx.shadowBlur = 10;
+        ctx.fillText(n.text, n.x, n.y);
+        ctx.shadowBlur = 0;
+    });
+
+    // Draw Particles
+    particles.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        drawHeart(p.x, p.y, 8 * p.life, p.color);
+        ctx.globalAlpha = 1;
+        if(p.life <= 0) particles.splice(i, 1);
+    });
+
+    requestAnimationFrame(gameLoop);
+}
+
+// Helper function to draw a heart shape
+function drawHeart(x, y, size, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y + size / 4);
+    ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
+    ctx.bezierCurveTo(x - size / 2, y + size / 2, x, y + size * 0.75, x, y + size);
+    ctx.bezierCurveTo(x, y + size * 0.75, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
+    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
+    ctx.fill();
+}
+
+// Prevent default touch behaviors like scrolling
+document.addEventListener('touchmove', {passive: false});
 
 </script>
 </body>
