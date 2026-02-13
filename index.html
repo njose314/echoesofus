@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Echoes of Us - Valentine's Special</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0d0d15;
+            font-family: 'Press Start 2P', cursive;
+            touch-action: none; /* Prevent zoom on mobile */
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        /* CRT Overlay Effect */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.1) 50%,
+                rgba(0,0,0,0.1)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            z-index: 20;
+            pointer-events: none;
+            text-shadow: 2px 2px #ff0055;
+        }
+
+        h1 { font-size: 24px; margin-bottom: 10px; color: #fff; }
+        p { font-size: 12px; color: #aaa; margin-top: 5px; }
+
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-sizing: border-box;
+            z-index: 30;
+            pointer-events: auto; /* Buttons must be clickable */
+        }
+
+        .btn {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            user-select: none;
+            backdrop-filter: blur(5px);
+            transition: transform 0.1s;
+        }
+
+        .btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.3); }
+        
+        #start-screen, #win-screen, #fail-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 13, 21, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            color: white;
+            text-align: center;
+        }
+
+        .hidden { display: none !important; }
+        
+        button.menu-btn {
+            background: #ff0055;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px #990033;
+            transition: transform 0.1s;
+        }
+        button.menu-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 #990033;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <div id="ui-layer">
+        <h1 id="level-title">PHASE 1: THE PAST</h1>
+        <p id="level-subtitle">Prepare the way for her...</p>
+    </div>
+
+    <div id="controls">
+        <div style="display: flex; gap: 20px;">
+            <div class="btn" id="btn-left">←</div>
+            <div class="btn" id="btn-right">→</div>
+        </div>
+        <div class="btn" id="btn-jump">↑</div>
+    </div>
+
+    <div id="start-screen">
+        <h1 style="color: #00f3ff; text-shadow: 2px 2px #ff0055;">ECHOES OF US</h1>
+        <p style="max-width: 600px; line-height: 1.5; padding: 20px;">
+            A Game About Timing & Trust.<br><br>
+            PHASE 1 (BLUE): Open the gates.<br>
+            PHASE 2 (PINK): Trust the path he made.<br><br>
+            Use Arrows or On-Screen Buttons.
+        </p>
+        <button class="menu-btn" onclick="startGame()">START JOURNEY</button>
+    </div>
+
+    <div id="win-screen" class="hidden">
+        <h1 style="color: #ff0055;">PERFECT SYNC!</h1>
+        <p>Across time, we are one.</p>
+        <p style="font-size: 10px; margin-top: 20px; color: #888;">Happy Valentine's Day</p>
+        <button class="menu-btn" onclick="resetGame()">REPLAY LOOP</button>
+    </div>
+
+    <div id="fail-screen" class="hidden">
+        <h1>TIME PARADOX</h1>
+        <p>The path was not clear.</p>
+        <button class="menu-btn" onclick="resetGame()">REWRITE HISTORY</button>
+    </div>
+</div>
+
+<script>
+    /** * AUDIO ENGINE (Synthesizer)
+     * Generates all sounds on the fly. No external files.
+     */
+    const AudioEngine = {
+        ctx: null,
+        init: function() {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        },
+        playTone: function(freq, type, duration, vol=0.1) {
+            if (!this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + duration);
+        },
+        playJump: function() { this.playTone(400, 'square', 0.1); },
+        playLand: function() { this.playTone(100, 'sine', 0.1, 0.2); },
+        playSwitch: function() { this.playTone(1200, 'triangle', 0.3, 0.1); },
+        playWin: function() { 
+            [0, 150, 300].forEach((delay, i) => {
+                setTimeout(() => this.playTone(600 + (i*200), 'sine', 0.5, 0.2), delay);
+            });
+        },
+        playRewind: function() {
+            // Simulated tape rewind noise
+            if (!this.ctx) return;
+            const bufferSize = this.ctx.sampleRate * 1.5;
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1; // White noise
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.5);
+            noise.connect(gain);
+            gain.connect(this.ctx.destination);
+            noise.start();
+        }
+    };
+
+    /**
+     * GAME ENGINE
+     */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Responsive Canvas
+    function resize() {
+        canvas.width = Math.min(window.innerWidth, 800);
+        canvas.height = Math.min(window.innerHeight, 600);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Game Constants
+    const GRAVITY = 0.6;
+    const SPEED = 5;
+    const JUMP_FORCE = -10;
+    
+    // Game State
+    let gameState = 'MENU'; // MENU, PHASE1, REWIND, PHASE2, WIN, FAIL
+    let frameCount = 0;
+    let particles = [];
+    
+    // Recording Data
+    let recording = []; // Stores {x, y, grounded, etc} per frame
+    let replayIndex = 0;
+
+    // Inputs
+    const keys = { left: false, right: false, up: false };
+
+    // Level Design (Tile Map: 1=Wall, 2=Spike, 3=SwitchA, 4=GateA, 9=Goal)
+    // A simple puzzle level
+    const TILE_SIZE = 40;
+    const levelMap = [
+        "11111111111111111111",
+        "1..................1",
+        "1..................1",
+        "1..3...............1", // Switch needs jump
+        "1.111.....444......1", // Gate blocks path
+        "1.......111111.....1",
+        "1..................1",
+        "1................9.1", // Goal
+        "1111...2222....11111", // Spikes
+        "11111111111111111111"
+    ];
+
+    // Entities
+    class Player {
+        constructor(color, isGhost = false) {
+            this.x = 80;
+            this.y = 200;
+            this.width = 30;
+            this.height = 30;
+            this.vx = 0;
+            this.vy = 0;
+            this.color = color;
+            this.grounded = false;
+            this.isGhost = isGhost;
+            
+            // Animation (Squash/Stretch)
+            this.scaleX = 1;
+            this.scaleY = 1;
+        }
+
+        update(input) {
+            if (this.isGhost) return; // Ghost is updated by replay system
+
+            // Horizontal Movement
+            if (input.left) this.vx = -SPEED;
+            else if (input.right) this.vx = SPEED;
+            else this.vx = 0;
+
+            // Jumping
+            if (input.up && this.grounded) {
+                this.vy = JUMP_FORCE;
+                this.grounded = false;
+                this.scaleX = 0.8; this.scaleY = 1.2; // Stretch
+                AudioEngine.playJump();
+                createParticles(this.x + this.width/2, this.y + this.height, this.color);
+            }
+
+            // Physics
+            this.vy += GRAVITY;
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Collision & Recovery
+            this.handleCollisions();
+
+            // Squash recovery
+            this.scaleX += (1 - this.scaleX) * 0.1;
+            this.scaleY += (1 - this.scaleY) * 0.1;
+
+            // Bounds
+            if (this.y > canvas.height) die();
+        }
+
+        handleCollisions() {
+            this.grounded = false;
+            
+            // Check Walls/Floors
+            let tiles = getSurroundingTiles(this.x, this.y);
+            
+            tiles.forEach(tile => {
+                if (tile.type === '1' || (tile.type === '4' && tile.active)) { // 1=Wall, 4=Closed Gate
+                    // AABB Collision
+                    if (checkRectCollide(this, tile)) {
+                        resolveCollision(this, tile);
+                    }
+                }
+                // Spikes
+                if (tile.type === '2') {
+                    if (checkRectCollide(this, tile)) die();
+                }
+                // Goal
+                if (tile.type === '9' && gameState === 'PHASE2' && !this.isGhost) {
+                    if (checkRectCollide(this, tile)) winGame();
+                }
+                // Switch (Only Blue can hit)
+                if (tile.type === '3') {
+                     if (checkRectCollide(this, tile)) {
+                         toggleGate(true);
+                     }
+                }
+            });
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x + this.width/2, this.y + this.height/2);
+            ctx.scale(this.scaleX, this.scaleY);
+            
+            // Ghost Effect (Glitchy)
+            if (this.isGhost) {
+                ctx.globalAlpha = 0.5 + Math.random() * 0.2;
+                if (Math.random() > 0.9) ctx.translate(Math.random()*5, 0); // Glitch
+            }
+
+            // Draw Heart Shape
+            ctx.fillStyle = this.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = this.color;
+            
+            let size = this.width / 2;
+            ctx.beginPath();
+            ctx.moveTo(0, size/2);
+            ctx.bezierCurveTo(size/2, -size/2, size, 0, 0, size);
+            ctx.bezierCurveTo(-size, 0, -size/2, -size/2, 0, size/2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+    }
+
+    let playerBlue = new Player('#00f3ff');
+    let playerPink = new Player('#ff0055');
+    let gateOpen = false;
+
+    // Helper Functions
+    function getSurroundingTiles(px, py) {
+        let tiles = [];
+        let startCol = Math.floor(px / TILE_SIZE);
+        let endCol = Math.floor((px + 30) / TILE_SIZE);
+        let startRow = Math.floor(py / TILE_SIZE);
+        let endRow = Math.floor((py + 30) / TILE_SIZE);
+
+        for (let r = startRow; r <= endRow; r++) {
+            for (let c = startCol; c <= endCol; c++) {
+                if (r >= 0 && r < levelMap.length && c >= 0 && c < levelMap[0].length) {
+                    let type = levelMap[r][c];
+                    if (type !== '.') {
+                        tiles.push({
+                            x: c * TILE_SIZE,
+                            y: r * TILE_SIZE,
+                            w: TILE_SIZE,
+                            h: TILE_SIZE,
+                            type: type,
+                            active: (type === '4' ? !gateOpen : true) // Gates are active (solid) if not open
+                        });
+                    }
+                }
+            }
+        }
+        return tiles;
+    }
+
+    function checkRectCollide(rect1, rect2) {
+        return (rect1.x < rect2.x + rect2.w &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.h &&
+                rect1.height + rect1.y > rect2.y);
+    }
+
+    function resolveCollision(p, t) {
+        // Simple resolution
+        let dx = (p.x + p.width/2) - (t.x + t.w/2);
+        let dy = (p.y + p.height/2) - (t.y + t.h/2);
+        let width = (p.width + t.w) / 2;
+        let height = (p.height + t.h) / 2;
+        let crossWidth = width * dy;
+        let crossHeight = height * dx;
+
+        if (Math.abs(dx) <= width && Math.abs(dy) <= height) {
+            if (crossWidth > crossHeight) {
+                if (crossWidth > -crossHeight) { // Bottom collision
+                    p.y = t.y + t.h;
+                    p.vy = 0;
+                } else { // Left collision
+                    p.x = t.x - p.width;
+                    p.vx = 0;
+                }
+            } else {
+                if (crossWidth > -crossHeight) { // Right collision
+                    p.x = t.x + t.w;
+                    p.vx = 0;
+                } else { // Top collision (Landing)
+                    p.y = t.y - p.height;
+                    p.vy = 0;
+                    p.grounded = true;
+                    // Squash
+                    if(p.vy > 2) { p.scaleX = 1.2; p.scaleY = 0.8; AudioEngine.playLand(); }
+                }
+            }
+        }
+    }
+
+    function toggleGate(state) {
+        if (gateOpen !== state) {
+            gateOpen = state;
+            AudioEngine.playSwitch();
+            // Shake screen
+            shake = 10;
+        }
+    }
+
+    function createParticles(x, y, color) {
+        for(let i=0; i<5; i++) {
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 30,
+                color: color
+            });
+        }
+    }
+
+    // Input Handling
+    window.addEventListener('keydown', e => {
+        if(e.code === 'ArrowLeft') keys.left = true;
+        if(e.code === 'ArrowRight') keys.right = true;
+        if(e.code === 'ArrowUp' || e.code === 'Space') keys.up = true;
+    });
+    window.addEventListener('keyup', e => {
+        if(e.code === 'ArrowLeft') keys.left = false;
+        if(e.code === 'ArrowRight') keys.right = false;
+        if(e.code === 'ArrowUp' || e.code === 'Space') keys.up = false;
+    });
+    
+    // Touch Controls
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const btnJump = document.getElementById('btn-jump');
+    
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
+    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
+    
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
+    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
+    
+    btnJump.addEventListener('touchstart', (e) => { e.preventDefault(); keys.up = true; });
+    btnJump.addEventListener('touchend', (e) => { e.preventDefault(); keys.up = false; });
+
+    // Game Logic
+    let shake = 0;
+
+    function startGame() {
+        AudioEngine.init();
+        document.getElementById('start-screen').classList.add('hidden');
+        resetPhase1();
+    }
+
+    function resetPhase1() {
+        gameState = 'PHASE1';
+        recording = [];
+        playerBlue = new Player('#00f3ff');
+        gateOpen = false;
+        document.getElementById('level-title').innerText = "PHASE 1: THE PAST";
+        document.getElementById('level-subtitle').innerText = "Hit the switch. Open the path.";
+        document.getElementById('level-subtitle').style.color = "#00f3ff";
+    }
+
+    function startRewind() {
+        gameState = 'REWIND';
+        AudioEngine.playRewind();
+        setTimeout(() => {
+            gameState = 'PHASE2';
+            replayIndex = 0;
+            playerPink = new Player('#ff0055');
+            // IMPORTANT: Gate resets! Pink relies on Blue's echo to open it again.
+            gateOpen = false; 
+            document.getElementById('level-title').innerText = "PHASE 2: THE PRESENT";
+            document.getElementById('level-subtitle').innerText = "Follow him. Trust the timing.";
+            document.getElementById('level-subtitle').style.color = "#ff0055";
+        }, 1500);
+    }
+
+    function die() {
+        if (gameState === 'PHASE1') {
+            resetPhase1(); // Retry Phase 1
+        } else if (gameState === 'PHASE2') {
+            document.getElementById('fail-screen').classList.remove('hidden');
+        }
+    }
+
+    function winGame() {
+        gameState = 'WIN';
+        AudioEngine.playWin();
+        document.getElementById('win-screen').classList.remove('hidden');
+    }
+
+    function resetGame() {
+        document.getElementById('win-screen').classList.add('hidden');
+        document.getElementById('fail-screen').classList.add('hidden');
+        resetPhase1();
+    }
+
+    // Main Loop
+    function loop() {
+        // Clear
+        ctx.fillStyle = '#0d0d15';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Shake Effect
+        if(shake > 0) {
+            ctx.save();
+            ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+            shake *= 0.9;
+        }
+
+        // Draw Map
+        for (let r = 0; r < levelMap.length; r++) {
+            for (let c = 0; c < levelMap[0].length; c++) {
+                let type = levelMap[r][c];
+                let x = c * TILE_SIZE;
+                let y = r * TILE_SIZE;
+
+                if (type === '1') { // Wall
+                    ctx.fillStyle = '#222';
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                } else if (type === '2') { // Spike
+                    ctx.fillStyle = '#ff0000';
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + TILE_SIZE);
+                    ctx.lineTo(x + TILE_SIZE/2, y);
+                    ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE);
+                    ctx.fill();
+                } else if (type === '3') { // Switch
+                    ctx.fillStyle = gateOpen ? '#444' : '#00f3ff';
+                    ctx.shadowBlur = gateOpen ? 0 : 10;
+                    ctx.shadowColor = '#00f3ff';
+                    ctx.fillRect(x + 5, y + 20, TILE_SIZE - 10, 20);
+                    ctx.shadowBlur = 0;
+                } else if (type === '4') { // Gate
+                    if (!gateOpen) {
+                        ctx.fillStyle = '#ff9900'; // Closed color
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE * 3); // Tall gate
+                        // Stripes
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(x+10, y, 5, TILE_SIZE*3);
+                    } else {
+                        // Open Gate Outline
+                        ctx.strokeStyle = '#333';
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE * 3);
+                    }
+                } else if (type === '9') { // Goal
+                    ctx.fillStyle = '#ff0055';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ff0055';
+                    ctx.beginPath();
+                    ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, 10 + Math.sin(frameCount * 0.1)*2, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+        }
+
+        // Logic
+        if (gameState === 'PHASE1') {
+            playerBlue.update(keys);
+            playerBlue.draw();
+            
+            // Record Frame
+            recording.push({
+                x: playerBlue.x,
+                y: playerBlue.y,
+                vx: playerBlue.vx,
+                vy: playerBlue.vy,
+                scaleX: playerBlue.scaleX,
+                scaleY: playerBlue.scaleY,
+                gateState: gateOpen
+            });
+            
+            // Phase 1 End Condition (Time limit or manual trigger? Let's use reaching end of map X)
+            // Just for this demo, let's say Phase 1 ends when Blue hits the switch and survives for 2 more seconds.
+            // SIMPLER: Blue touches the Goal to "set the timeline"
+            if (checkGoal(playerBlue)) {
+                startRewind();
+            }
+
+        } else if (gameState === 'REWIND') {
+            // Visual Rewind
+            ctx.font = "30px 'Press Start 2P'";
+            ctx.fillStyle = "white";
+            ctx.fillText("REWINDING...", canvas.width/2 - 100, canvas.height/2);
+            
+            // Glitch Effect
+            if (Math.random() > 0.5) {
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect(0,0,canvas.width, canvas.height);
+            }
+
+        } else if (gameState === 'PHASE2') {
+            // Replay Blue Ghost
+            if (replayIndex < recording.length) {
+                let frame = recording[replayIndex];
+                playerBlue.x = frame.x;
+                playerBlue.y = frame.y;
+                playerBlue.scaleX = frame.scaleX;
+                playerBlue.scaleY = frame.scaleY;
+                playerBlue.isGhost = true;
+                
+                // CRITICAL: The ghost must trigger the gate visually/logically
+                if (frame.gateState && !gateOpen) toggleGate(true); // Ghost opened it
+                
+                playerBlue.draw();
+                replayIndex++;
+            } else {
+                // Ghost ran out of time
+                playerBlue.isGhost = true;
+                playerBlue.draw(); // Just stays at last frame
+            }
+
+            // Play Pink
+            playerPink.update(keys);
+            playerPink.draw();
+        }
+
+        // Particles
+        particles.forEach((p, i) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life / 30;
+            ctx.fillRect(p.x, p.y, 4, 4);
+            ctx.globalAlpha = 1;
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+
+        if(shake > 0) ctx.restore();
+
+        frameCount++;
+        requestAnimationFrame(loop);
+    }
+
+    function checkGoal(p) {
+        // Goal is '9'
+        let tiles = getSurroundingTiles(p.x, p.y);
+        for(let t of tiles) {
+            if(t.type === '9' && checkRectCollide(p, t)) return true;
+        }
+        return false;
+    }
+
+    // Start loop
+    loop();
+
+</script>
+</body>
+</html>
