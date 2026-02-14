@@ -27,10 +27,12 @@
     }
 
     canvas {
-        image-rendering: pixelated; /* Sharp retro pixels */
-        box-shadow: 0 0 50px rgba(255, 0, 85, 0.1);
+        image-rendering: pixelated;
+        box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
+        width: 100%;
+        height: 100%;
         max-width: 100%;
-        max-height: 100%;
+        object-fit: contain;
     }
 
     /* UI Overlay */
@@ -49,65 +51,64 @@
         display: flex;
         justify-content: space-between;
         color: white;
-        text-shadow: 2px 2px #ff0055;
+        text-shadow: 2px 2px #00f3ff;
         font-size: 14px;
+        margin-bottom: 10px;
     }
 
-    /* Ammo Bar */
-    #ammo-container {
-        width: 100px;
-        height: 10px;
-        background: #333;
-        border: 2px solid white;
-        margin-top: 10px;
+    /* Bars */
+    .bar-container {
+        width: 100px; height: 10px; background: #333; border: 2px solid white; margin-bottom: 5px;
     }
-    #ammo-fill {
-        width: 100%;
-        height: 100%;
-        background: #ff0055;
-        transition: width 0.1s;
+    #ammo-fill { width: 100%; height: 100%; background: #ff0055; transition: width 0.1s; }
+    
+    /* Diamond Counter */
+    #diamond-tracker {
+        color: #00f3ff; text-align: right; font-size: 12px; margin-top: 5px;
     }
 
-    /* Start Screen */
-    #start-screen {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
+    /* Screens */
+    .screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(5, 5, 5, 0.95);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
-        pointer-events: auto;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        z-index: 100; pointer-events: auto;
+        text-align: center;
     }
+    .hidden { display: none !important; }
 
     h1 {
-        color: #ff0055;
-        text-align: center;
-        font-size: 30px;
-        line-height: 1.5;
-        margin-bottom: 30px;
-        text-shadow: 4px 4px #fff;
+        color: #00f3ff; font-size: 30px; line-height: 1.5; margin-bottom: 30px;
+        text-shadow: 4px 4px #ff0055;
     }
+    
+    p { color: #ccc; font-size: 12px; line-height: 1.8; max-width: 80%; margin-bottom: 20px; }
 
     button {
-        background: #fff;
-        border: 4px solid #ff0055;
-        color: #ff0055;
-        font-family: 'Press Start 2P', cursive;
-        padding: 20px 40px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: transform 0.1s;
-        box-shadow: 0 6px #88002d;
+        background: #00f3ff; border: 4px solid #fff; color: #000;
+        font-family: 'Press Start 2P', cursive; padding: 20px 40px;
+        font-size: 16px; cursor: pointer; transition: transform 0.1s;
+        box-shadow: 0 6px #008899; margin-top: 20px;
     }
-    button:active { transform: translateY(6px); box-shadow: 0 0 #88002d; }
+    button:active { transform: translateY(6px); box-shadow: 0 0 #008899; }
 
-    #controls-hint {
-        color: #666; font-size: 10px; margin-top: 20px; text-align: center; line-height: 1.6;
+    /* NOTE OVERLAY */
+    #note-overlay {
+        background: rgba(0, 0, 0, 0.9);
+        border: 4px solid #00f3ff;
+        padding: 20px;
+        width: 80%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 0 30px #00f3ff;
     }
-
-    /* Invisible Touch Zones */
+    #note-text {
+        color: #fff; font-size: 14px; line-height: 1.6; margin-bottom: 30px;
+    }
+    
+    /* Touch Zones */
     #mobile-controls {
         position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 50; display: none;
     }
@@ -115,6 +116,7 @@
     #zone-left { left: 0; width: 30%; }
     #zone-right { right: 0; width: 30%; }
     #zone-fire { left: 30%; width: 40%; }
+
 </style>
 </head>
 <body>
@@ -128,7 +130,8 @@
                 <span>DEPTH: <span id="depth">0</span>m</span>
                 <span>HP: <span id="hp">❤❤❤</span></span>
             </div>
-            <div id="ammo-container"><div id="ammo-fill"></div></div>
+            <div class="bar-container"><div id="ammo-fill"></div></div>
+            <div id="diamond-tracker">DIAMONDS: <span id="gems">0</span>/10 💎</div>
         </div>
     </div>
 
@@ -138,74 +141,156 @@
         <div id="zone-right" class="touch-zone"></div>
     </div>
 
-    <div id="start-screen">
+    <div id="start-screen" class="screen">
         <h1>FALLING<br>FOR YOU</h1>
-        <button id="start-btn">TAKE THE PLUNGE</button>
-        <div id="controls-hint">
-            ARROWS to Move • SPACE to Shoot<br>
-            (Mobile: Sides to Move • Center to Fire)
+        <p>Collect 10 Diamonds to Win Her Heart.</p>
+        <button id="start-btn">JUMP IN</button>
+        <p style="font-size: 10px; margin-top: 20px;">(Turn Volume Up)</p>
+    </div>
+
+    <div id="note-screen" class="screen hidden">
+        <div id="note-overlay">
+            <h2 style="color: #ff0055; font-size: 12px; margin-bottom: 10px;">SYSTEM MESSAGE</h2>
+            <div id="note-text">Loading...</div>
+            <button id="resume-btn" style="font-size: 12px; padding: 10px 20px;">CONTINUE FALLING</button>
         </div>
+    </div>
+
+    <div id="win-screen" class="screen hidden">
+        <h1 style="color: #ff0055;">MISSION COMPLETE</h1>
+        <p>You collected all the fragments.</p>
+        <p style="color: #00f3ff; margin-top: 20px;">"Just like this game, I will always catch you when you fall. Happy Valentine's Day."</p>
+        <button onclick="location.reload()">PLAY AGAIN</button>
     </div>
 </div>
 
+<audio id="bgm" loop>
+    <source src="https://archive.org/download/Rolemusic_s_Playlist/Rolemusic%20-%20The%20Black%20Dot.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-/** * AUDIO ENGINE 
+/**
+ * --- 200 GEEKY/FLIRTY LINES DATABASE ---
  */
-const Audio = {
-    ctx: null,
-    init: function() {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioContext();
-    },
-    playTone: function(freq, type, dur, vol=0.1) {
-        if(!this.ctx) return;
-        const o = this.ctx.createOscillator();
-        const g = this.ctx.createGain();
-        o.type = type;
-        o.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        g.gain.setValueAtTime(vol, this.ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + dur);
-        o.connect(g);
-        g.connect(this.ctx.destination);
-        o.start();
-        o.stop(this.ctx.currentTime + dur);
-    },
-    shoot: function() { this.playTone(200, 'square', 0.1); },
-    jump: function() { this.playTone(300, 'sine', 0.1); },
-    explode: function() { 
-        if(!this.ctx) return;
-        const b = this.ctx.createBuffer(1, 44100*0.2, 44100);
-        const d = b.getChannelData(0);
-        for(let i=0; i<d.length; i++) d[i] = Math.random()*2-1;
-        const s = this.ctx.createBufferSource(); s.buffer = b;
-        const g = this.ctx.createGain(); g.gain.value = 0.2;
-        s.connect(g); g.connect(this.ctx.destination); s.start();
-    },
-    reload: function() { this.playTone(600, 'triangle', 0.1, 0.05); }
+const LOVE_DB = [
+    "You are the CSS to my HTML.", "My heart beats at 144Hz for you.", "You are my favorite notification.",
+    "I'd never sudo rm -rf you.", "You are 100% my type.", "Are you a keyboard? Because you're my type.",
+    "My love for you is infinite loop.", "You auto-complete me.", "You are the root of my heart.",
+    "I want to commit to you.", "Let's merge our branches.", "You are high priority.",
+    "No lag when I'm with you.", "You optimize my life.", "My dopamine overflows for you.",
+    "You are my production environment.", "I'm compiled to love you.", "Access granted: Always.",
+    "You are the only variable I need.", "Garbage collection deleted my exes.", "Deploying hugs...",
+    "You're my favorite API.", "Let's pair program life.", "You are my source code.",
+    "System status: In love.", "You have full admin rights.", "My firewall is down for you.",
+    "You are my steady state.", "I'm stuck in your orbit.", "Gravity points to you.",
+    "You shine brighter than RGB.", "You are my safe house.", "Level 100 Boss of beauty.",
+    "I'd pause my game for you.", "You are the ultimate loot.", "My player 2 forever.",
+    "Game over? Never with you.", "You unlock my best self.", "I'm buffering... staring at you.",
+    "High fidelity love.", "You render perfectly.", "No artifacts in your beauty.",
+    "You are my GPU (Gorgeous Person Unit).", "Frame rate: Smooth.", "Ping: 0ms.",
+    "Packet loss: 0%.", "Connection: Secure.", "Bandwidth: Unlimited.",
+    "You are my cloud storage.", "I'm uploading my heart.", "Sync complete.",
+    "You are my backup plan.", "Restore point created.", "You are my home directory.",
+    "cd /home/you", "mkdir love", "touch heart", "chmod 777 heart",
+    "You have permission to everything.", "Execute order: Kiss.", "Runtime: Forever.",
+    "Exception handled: You.", "Catch block: Me.", "Try: Us.",
+    "While(alive) { love(you); }", "If (you) { smile(); }", "Return true;",
+    "Boolean isHappy = true;", "String myLove = 'You';", "Array of memories.",
+    "Object oriented love.", "Functional relationship.", "Agile romance.",
+    "Sprint planning: Date night.", "Daily standup: Kiss.", "Retrospective: You're amazing.",
+    "Jira ticket: Cuddle.", "Status: Done.", "Blocker: Miss you.",
+    "Bug free love.", "Feature request: More hugs.", "Patch notes: Loves you more.",
+    "Version 1.0 -> 2.0.", "Upgrade complete.", "Installing love...",
+    "Download finished.", "Open file?", "Yes.", "Run as administrator.",
+    "Warning: Too hot.", "Error 404: Flaws not found.", "Server status: Online.",
+    "Database connected.", "Query: Select * from World where Name = You.", "Result: 1 row found.",
+    "Index on HeartID.", "Primary Key: You.", "Foreign Key: Me.",
+    "Join Table: Us.", "Commit transaction.", "Rollback? Never.",
+    "ACID compliant love.", "Scalable affection.", "Load balanced.",
+    "Microservices: Hugs, Kisses, Talks.", "Monolith of love.", "Docker container: Us.",
+    "Kubernetes cluster of hearts.", "Pod status: Running.", "Log: Love you.",
+    "Console.log('You are cute');", "Print('Hello Beautiful');", "Echo 'I love you';",
+    "System.out.println('Be mine');", "Alert('You stole my heart');", "Prompt('Kiss me?');",
+    "Confirm('Forever?');", "Body { background: You; }", "Div { border: Love; }",
+    "Span { color: Passion; }", "Font-family: 'Your Handwriting';", "Text-align: Center;",
+    "Margin: 0;", "Padding: All;", "Display: Flex;",
+    "Justify-content: Love;", "Align-items: Together;", "Z-index: 9999;",
+    "Opacity: 100%.", "Visibility: Visible.", "Transform: Rotate(Heart);",
+    "Transition: Forever ease-in;", "Animation: Beat infinite;", "Keyframes: Love;",
+    "Media query: Screen and (max-width: You).", "Responsive love.", "Mobile first.",
+    "Desktop compatible.", "Cross-browser love.", "IE6 compatible (that strong).",
+    "HTTPS secure.", "SSL certificate valid.", "Domain: Us.com.",
+    "Subdomain: Life.", "Path: /Future.", "Query string: ?love=true.",
+    "Anchor tag: <a href='You'>", "Img src='YourSmile.jpg'>", "Input type='Heart'>",
+    "Button onclick='Kiss()'>", "Form method='Post'>", "Action='Love'>",
+    "Script src='Romance.js'>", "Link rel='Stylesheet'>", "Meta name='Love'>",
+    "Title: Us.", "Header: You.", "Footer: Me.",
+    "Main: Our life.", "Section: Dreams.", "Article: Hope.",
+    "Aside: Fun.", "Nav: Direction.", "Canvas: Memories.",
+    "SVG: Scalable Vector Graphics of Love.", "Pixel perfect.", "Retina display.",
+    "4K Video.", "Dolby Surround Sound.", "IMAX experience.",
+    "Blockbuster hit.", "Oscar winner.", "Best Picture.",
+    "Best Actress: You.", "Director: Fate.", "Producer: Destiny.",
+    "Script: Unwritten.", "Improvise.", "Scene 1: Take 1.",
+    "Action!", "Cut!", "Perfect take.", "Encore.",
+    "Applause.", "Standing ovation.", "Curtain call.",
+    "Backstage pass.", "VIP access.", "Access all areas.",
+    "Tour bus.", "Road trip.", "Adventure time.",
+    "Map coordinates.", "GPS locked.", "Destination reached.",
+    "You have arrived.", "Welcome.", "Glad you're here.",
+    "Stay awhile.", "Don't go.", "Sleep over.",
+    "Breakfast in bed.", "Coffee?", "Tea?",
+    "Waffles.", "Pancakes.", "Syrup.", "Sweet.",
+    "Sugar.", "Spice.", "Everything nice.",
+    "Chemical X.", "Powerpuff Girl.", "Hero.",
+    "Villain (the playful kind).", "Sidekick.", "Partner.",
+    "Duo.", "Team.", "Squad.", "Clan.",
+    "Guild.", "Party.", "Raid.", "Loot.",
+    "Experience points.", "Level up.", "Skill tree.",
+    "Passive ability: Cute.", "Active ability: Kiss.", "Ultimate: Love.",
+    "Mana cost: 0.", "Cooldown: 0.", "Range: Infinite.",
+    "Damage: 0.", "Healing: 100%.", "Buff: Happiness.",
+    "Debuff: None.", "Status effect: Love-struck.", "Critical hit."
+];
+
+/** * AUDIO ENGINE (Standard HTML5) */
+const SFX = {
+    shoot: new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg"), // Reliable Google hosted
+    jump: new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"),
+    collect: new Audio("https://actions.google.com/sounds/v1/science_fiction/scifi_laser_machine.ogg"), 
+    explosion: new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"),
+    win: new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg")
 };
 
-/** * GAME CONSTANTS & STATE 
- */
+// Fallback volume
+Object.values(SFX).forEach(s => s.volume = 0.3);
+
+const Music = document.getElementById('bgm');
+Music.volume = 0.4;
+
+/** * GAME CONSTANTS */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const GRAVITY = 0.5;
 const MAX_FALL = 10;
-const SHOOT_FORCE = -4; // Recoil
+const SHOOT_FORCE = -4; 
 const MOVE_SPEED = 0.8;
 const MAX_AMMO = 8;
+const WIN_SCORE = 10;
 
 let gameState = 'MENU'; 
-let score = 0;
+let score = 0; // Depth
+let diamonds = 0; // Win Condition
 let hp = 3;
 let ammo = MAX_AMMO;
 let frame = 0;
 let shake = 0;
-let timeScale = 1.0; // For Slo-Mo
+let timeScale = 1.0; 
 let cameraY = 0;
 
 // Inputs
-const keys = { left: false, right: false, shoot: false, shootPressed: false };
+const keys = { left: false, right: false, shoot: false };
 
 // Entities
 const player = { x: 0, y: 0, w: 16, h: 24, vx: 0, vy: 0, facing: 1, cooldown: 0, iframes: 0 };
@@ -214,65 +299,63 @@ let enemies = [];
 let bullets = [];
 let particles = [];
 let texts = [];
+let gems = [];
 
-// Screen Sizing
+// Resize
 function resize() {
-    // Fixed logic resolution (320px wide), scale up to fit screen
     const targetRatio = 320 / 480;
     const screenRatio = window.innerWidth / window.innerHeight;
-    
-    let w, h;
     if (screenRatio > targetRatio) {
-        h = window.innerHeight;
-        w = h * targetRatio;
+        canvas.height = window.innerHeight;
+        canvas.width = canvas.height * targetRatio;
     } else {
-        w = window.innerWidth;
-        h = w / targetRatio;
+        canvas.width = window.innerWidth;
+        canvas.height = canvas.width / targetRatio;
     }
-    
-    // Internal canvas resolution
-    canvas.width = 320;
-    canvas.height = 320 / screenRatio; // Adaptive height
-    
-    // CSS visual scaling handled by flex container
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
+    // Logic resolution matches display for crispness or fixed logic? 
+    // Let's use fixed logic resolution of 320 wide
+    ctx.scale(canvas.width/320, canvas.width/320);
 }
-window.addEventListener('resize', resize);
-resize();
+// We will use a fixed internal resolution of 320x(dynamic)
+const INTERNAL_W = 320;
+let INTERNAL_H = 480;
+
+function handleResize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    INTERNAL_H = INTERNAL_W * (canvas.height / canvas.width);
+}
+window.addEventListener('resize', handleResize);
+handleResize();
 
 function reset() {
     gameState = 'PLAY';
-    player.x = canvas.width/2; player.y = 50; player.vx = 0; player.vy = 0;
-    hp = 3; ammo = MAX_AMMO; score = 0; cameraY = 0;
-    platforms = []; enemies = []; bullets = []; particles = []; texts = [];
-    platforms.push({x: canvas.width/2-40, y: 150, w: 80, h: 10, type: 'safe'});
-    generateLevel(cameraY + canvas.height*2);
+    player.x = INTERNAL_W/2; player.y = 50; player.vx = 0; player.vy = 0;
+    hp = 3; ammo = MAX_AMMO; score = 0; diamonds = 0; cameraY = 0;
+    platforms = []; enemies = []; bullets = []; particles = []; texts = []; gems = [];
+    platforms.push({x: INTERNAL_W/2-40, y: 150, w: 80, h: 10, type: 'safe'});
+    generateLevel(cameraY + INTERNAL_H*2);
     updateUI();
 }
 
-/** * LOGIC 
- */
+/** * LOGIC */
 function update() {
+    if(gameState === 'PAUSE' || gameState === 'WIN') return;
+    
     // Slo-Mo Recovery
     if(timeScale < 1.0) timeScale += 0.05;
     if(timeScale > 1.0) timeScale = 1.0;
 
-    // Apply Shake
-    let shakeX = 0, shakeY = 0;
-    if(shake > 0) {
-        shakeX = (Math.random()-0.5)*shake;
-        shakeY = (Math.random()-0.5)*shake;
-        shake *= 0.9;
-        if(shake < 0.5) shake = 0;
-    }
+    // Shake Decay
+    if(shake > 0) shake *= 0.9;
+    if(shake < 0.5) shake = 0;
 
     if (gameState !== 'PLAY') return;
 
     // 1. PLAYER PHYSICS
     if (keys.left) player.vx -= MOVE_SPEED * timeScale;
     if (keys.right) player.vx += MOVE_SPEED * timeScale;
-    player.vx *= 0.85; // Friction
+    player.vx *= 0.85; 
 
     player.vy += GRAVITY * timeScale;
     if(player.vy > MAX_FALL) player.vy = MAX_FALL;
@@ -281,39 +364,34 @@ function update() {
     player.y += player.vy * timeScale;
 
     // Wrap
-    if(player.x < -player.w) player.x = canvas.width;
-    if(player.x > canvas.width) player.x = -player.w;
+    if(player.x < -player.w) player.x = INTERNAL_W;
+    if(player.x > INTERNAL_W) player.x = -player.w;
 
     // Camera
-    let targetY = player.y - canvas.height * 0.3;
+    let targetY = player.y - INTERNAL_H * 0.3;
     if(targetY > cameraY) cameraY += (targetY - cameraY) * 0.1;
 
-    // 2. SHOOTING (FIX: Ammo Check)
+    // 2. SHOOTING 
     if(player.cooldown > 0) player.cooldown--;
     
     if(keys.shoot && player.cooldown <= 0 && ammo > 0) {
         player.cooldown = 10;
         ammo--;
         updateUI();
-        
-        player.vy = -4; // Recoil Jump (The Infinite Fly Fix: Limited by ammo!)
-        
+        player.vy = -4; 
         bullets.push({x: player.x+4, y: player.y+player.h, w: 8, h: 12, life: 30});
-        Audio.shoot();
+        playSfx('shoot');
         shake = 3;
-        
-        // Shells
         for(let i=0; i<3; i++) spawnParticle(player.x+8, player.y+12, '#ff0055');
     }
 
-    // 3. COLLISION (Player vs Platforms)
+    // 3. COLLISION
     platforms.forEach(p => {
         if(rectCol(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)) {
-            // Landing Logic (Only if falling and above platform)
-            if(player.vy > 0 && player.y+player.h-player.vy*timeScale <= p.y + 5) {
+            if(player.vy > 0 && player.y+player.h-player.vy*timeScale <= p.y + 10) {
                 player.y = p.y - player.h;
                 player.vy = 0;
-                if(ammo < MAX_AMMO) { ammo = MAX_AMMO; Audio.reload(); updateUI(); } // RELOAD!
+                if(ammo < MAX_AMMO) { ammo = MAX_AMMO; playSfx('collect'); updateUI(); }
             }
         }
     });
@@ -321,7 +399,7 @@ function update() {
     // 4. BULLETS vs ENEMIES
     for(let i=bullets.length-1; i>=0; i--) {
         let b = bullets[i];
-        b.y += 15 * timeScale; // Bullets fall fast
+        b.y += 15 * timeScale; 
         b.life--;
         
         for(let j=enemies.length-1; j>=0; j--) {
@@ -330,50 +408,59 @@ function update() {
                 e.hp--;
                 b.life = 0;
                 spawnParticle(b.x, b.y, '#fff');
-                
-                if(e.hp <= 0) {
-                    killEnemy(e, j);
-                }
+                if(e.hp <= 0) killEnemy(e, j);
                 break;
             }
         }
         if(b.life <= 0) bullets.splice(i, 1);
     }
 
-    // 5. PLAYER vs ENEMIES
+    // 5. PLAYER vs ENTITIES
     if(player.iframes > 0) player.iframes--;
     
     enemies.forEach((e, idx) => {
+        // Sine Wave Movement
+        if(e.type === 'floater') {
+            e.x = e.startX + Math.sin(frame * 0.05) * 30;
+        }
+
         if(rectCol(player.x, player.y, player.w, player.h, e.x, e.y, e.w, e.h)) {
-            // Stomp Logic (Mario Style)
             if(player.vy > 0 && player.y+player.h-player.vy*timeScale <= e.y + e.h*0.5) {
-                player.vy = -6; // Bounce
-                ammo = MAX_AMMO; updateUI(); // Reload on stomp!
+                player.vy = -6; 
+                ammo = MAX_AMMO; updateUI(); 
                 killEnemy(e, idx);
-                Audio.jump();
+                playSfx('jump');
             } else if(player.iframes <= 0) {
-                // Hurt Logic
                 hp--;
                 player.iframes = 60;
                 player.vy = -5;
                 shake = 10;
-                timeScale = 0.1; // Impact freeze
+                timeScale = 0.1; 
                 updateUI();
                 if(hp <= 0) gameOver();
             }
         }
     });
 
+    // DIAMONDS
+    for(let i=gems.length-1; i>=0; i--) {
+        let g = gems[i];
+        if(rectCol(player.x, player.y, player.w, player.h, g.x, g.y, g.w, g.h)) {
+            collectDiamond(i);
+        }
+    }
+
     // Cleanup & Gen
     platforms = platforms.filter(p => p.y > cameraY - 50);
     enemies = enemies.filter(e => e.y > cameraY - 50);
-    generateLevel(cameraY + canvas.height + 200);
+    gems = gems.filter(g => g.y > cameraY - 50);
+    generateLevel(cameraY + INTERNAL_H + 200);
 
     // Score
     let depth = Math.floor(player.y/10);
     if(depth > score) { score = depth; document.getElementById('depth').innerText = score; }
 
-    // Particles & Text
+    // Particles
     particles.forEach((p,i) => {
         p.x += p.vx * timeScale; p.y += p.vy * timeScale; p.life--;
         if(p.life<=0) particles.splice(i,1);
@@ -383,17 +470,23 @@ function update() {
         if(t.life<=0) texts.splice(i,1);
     });
 
-    // RENDER
-    render(shakeX, shakeY);
+    frame++;
+    render();
     requestAnimationFrame(update);
 }
 
-function render(sx, sy) {
-    ctx.setTransform(1,0,0,1,0,0);
+function render() {
+    // Canvas Scale Logic
+    const scale = canvas.width / INTERNAL_W;
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    
     ctx.fillStyle = '#050505';
-    ctx.fillRect(0,0,canvas.width, canvas.height);
+    ctx.fillRect(0,0,INTERNAL_W, INTERNAL_H/scale * scale); // Fill all
 
-    ctx.translate(sx, sy - cameraY + 100); // Camera Offset
+    // Shake
+    let sx = (Math.random()-0.5)*shake;
+    let sy = (Math.random()-0.5)*shake;
+    ctx.translate(sx, sy - cameraY + 100);
 
     // Platforms
     ctx.fillStyle = '#fff';
@@ -402,87 +495,116 @@ function render(sx, sy) {
         ctx.fillStyle = '#ff0055'; ctx.fillRect(p.x, p.y, p.w, 2); ctx.fillStyle='#fff';
     });
 
+    // Gems
+    gems.forEach(g => {
+        ctx.fillStyle = '#00f3ff';
+        ctx.beginPath();
+        ctx.moveTo(g.x + g.w/2, g.y);
+        ctx.lineTo(g.x + g.w, g.y + g.h/2);
+        ctx.lineTo(g.x + g.w/2, g.y + g.h);
+        ctx.lineTo(g.x, g.y + g.h/2);
+        ctx.fill();
+        // Glow
+        ctx.shadowBlur = 10; ctx.shadowColor = '#00f3ff';
+        ctx.fill(); ctx.shadowBlur = 0;
+    });
+
     // Enemies
     enemies.forEach(e => {
-        ctx.fillStyle = e.type==='block' ? '#ff0055' : '#ff4444';
+        ctx.fillStyle = e.type==='block' ? '#ff0055' : '#ffaa00';
         ctx.fillRect(e.x, e.y, e.w, e.h);
-        // Face
         ctx.fillStyle = '#fff';
         ctx.fillRect(e.x+5, e.y+5, 4, 4); ctx.fillRect(e.x+e.w-9, e.y+5, 4, 4);
-        ctx.fillRect(e.x+8, e.y+15, e.w-16, 2);
     });
 
     // Bullets
     ctx.fillStyle = '#fff';
     bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
 
-    // Player (Procedural Sprite)
-    if(player.iframes%4 < 2) { // Flicker if hurt
+    // Player
+    if(player.iframes%4 < 2) {
         ctx.save();
         ctx.translate(player.x + player.w/2, player.y + player.h/2);
-        
-        // Stretch based on velocity
-        let sy = 1 + Math.abs(player.vy)*0.05;
-        let sx = 1 / sy;
-        ctx.scale(sx, sy);
-
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(-8, -12, 16, 24); // Body
-        ctx.fillStyle = '#ff0055';
-        ctx.fillRect(-6, -8, 12, 4); // Scarf
-        
-        // Eyes
+        let sy = 1 + Math.abs(player.vy)*0.05; ctx.scale(1/sy, sy);
+        ctx.fillStyle = '#fff'; ctx.fillRect(-8, -12, 16, 24);
+        ctx.fillStyle = '#ff0055'; ctx.fillRect(-6, -8, 12, 4);
         ctx.fillStyle = '#000';
-        if(keys.left) { ctx.fillRect(-6, -6, 2, 4); }
-        else if(keys.right) { ctx.fillRect(4, -6, 2, 4); }
+        if(keys.left) ctx.fillRect(-6, -6, 2, 4);
+        else if(keys.right) ctx.fillRect(4, -6, 2, 4);
         else { ctx.fillRect(-4, -6, 2, 4); ctx.fillRect(2, -6, 2, 4); }
-        
         ctx.restore();
     }
 
-    // Particles
-    particles.forEach(p => {
-        ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 4, 4);
-    });
-
-    // Text
+    // Particles & Text
+    particles.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 4, 4); });
+    
     ctx.font = '10px "Press Start 2P"';
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
     texts.forEach(t => ctx.fillText(t.str, t.x, t.y));
 }
 
-/** * LEVEL GEN & HELPERS 
- */
+/** * LEVEL GEN */
 let lastY = 200;
 function generateLevel(targetY) {
     while(lastY < targetY) {
-        lastY += 60 + Math.random()*40;
-        if(Math.random() > 0.3) {
+        lastY += 50 + Math.random()*40;
+        let r = Math.random();
+        
+        // 10% Chance for Diamond
+        if(Math.random() < 0.1) {
+             let x = Math.random()*(INTERNAL_W-20);
+             gems.push({x, y: lastY - 30, w: 15, h: 15});
+        }
+
+        if(r < 0.6) {
             // Platform
             let w = 50 + Math.random()*60;
-            let x = Math.random()*(canvas.width-w);
+            let x = Math.random()*(INTERNAL_W-w);
             platforms.push({x, y: lastY, w, h: 10});
             // Enemy?
-            if(Math.random()>0.5) enemies.push({x: x+10, y: lastY-25, w: 20, h: 20, hp: 1, type: 'walker'});
+            if(Math.random()>0.5) enemies.push({
+                x: x+10, y: lastY-25, w: 20, h: 20, hp: 1, 
+                type: Math.random()>0.5 ? 'walker' : 'floater',
+                startX: x+10
+            });
         } else {
             // Floating Block
-            let x = Math.random()*(canvas.width-30);
+            let x = Math.random()*(INTERNAL_W-30);
             enemies.push({x, y: lastY, w: 30, h: 30, hp: 3, type: 'block'});
         }
     }
 }
 
+/** * EVENTS & HELPERS */
+const words = ["WOW!", "NICE!", "EPIC!", "GREAT!", "BOOM!", "COOL!"];
+
 function killEnemy(e, idx) {
     enemies.splice(idx, 1);
-    Audio.explode();
+    playSfx('explosion');
     shake = 6;
-    timeScale = 0.2; // SLO-MO EFFECT!
+    timeScale = 0.2; 
     spawnText(e.x, e.y);
     for(let i=0; i<8; i++) spawnParticle(e.x+e.w/2, e.y+e.h/2, '#ff0055');
 }
 
-const words = ["CUTE", "WOW", "HOT", "MINE", "YES", "BABY", "LOVE"];
+function collectDiamond(idx) {
+    gems.splice(idx, 1);
+    diamonds++;
+    playSfx('collect');
+    
+    // Pause Game & Show Note
+    gameState = 'PAUSE';
+    const note = LOVE_DB[Math.floor(Math.random() * LOVE_DB.length)];
+    document.getElementById('note-text').innerText = note;
+    document.getElementById('note-screen').classList.remove('hidden');
+    updateUI();
+    
+    // Check Win
+    if(diamonds >= WIN_SCORE) {
+        setTimeout(winGame, 500); // Slight delay before win screen if it was the last one
+    }
+}
+
 function spawnText(x, y) {
     texts.push({x, y, str: words[Math.floor(Math.random()*words.length)], life: 40});
 }
@@ -499,14 +621,36 @@ function updateUI() {
     let h = ""; for(let i=0; i<hp; i++) h+="❤";
     document.getElementById('hp').innerText = h;
     document.getElementById('ammo-fill').style.width = `${(ammo/MAX_AMMO)*100}%`;
+    document.getElementById('gems').innerText = diamonds;
+}
+
+function winGame() {
+    gameState = 'WIN';
+    playSfx('win');
+    document.getElementById('win-screen').classList.remove('hidden');
+    document.getElementById('note-screen').classList.add('hidden');
 }
 
 function gameOver() {
     gameState = 'MENU';
     document.getElementById('start-screen').style.display = 'flex';
-    document.querySelector('h1').innerHTML = "GAME OVER<br>SCORE: " + score;
+    document.querySelector('#start-screen h1').innerHTML = "GAME OVER";
     document.getElementById('start-btn').innerText = "TRY AGAIN";
 }
+
+function playSfx(name) {
+    // Clone to allow overlap
+    const s = SFX[name].cloneNode();
+    s.volume = 0.3;
+    s.play().catch(e => console.log(e));
+}
+
+// Resume Button
+document.getElementById('resume-btn').addEventListener('click', () => {
+    document.getElementById('note-screen').classList.add('hidden');
+    gameState = 'PLAY';
+    player.iframes = 30; // Safety buffer
+});
 
 // Controls
 window.addEventListener('keydown', e => {
@@ -516,7 +660,7 @@ window.addEventListener('keydown', e => {
         if(gameState==='MENU') { 
             document.getElementById('start-screen').style.display='none'; 
             document.getElementById('mobile-controls').style.display='block';
-            Audio.init(); reset(); update(); 
+            Music.play(); reset(); update(); 
         }
         keys.shoot=true;
     }
@@ -530,24 +674,17 @@ window.addEventListener('keyup', e => {
 // Touch
 const touchStart = (key) => (e) => { e.preventDefault(); keys[key] = true; };
 const touchEnd = (key) => (e) => { e.preventDefault(); keys[key] = false; };
-
 document.getElementById('zone-left').addEventListener('touchstart', touchStart('left'));
 document.getElementById('zone-left').addEventListener('touchend', touchEnd('left'));
-
 document.getElementById('zone-right').addEventListener('touchstart', touchStart('right'));
 document.getElementById('zone-right').addEventListener('touchend', touchEnd('right'));
-
-document.getElementById('zone-fire').addEventListener('touchstart', (e) => {
-    e.preventDefault(); keys.shoot=true;
-});
-document.getElementById('zone-fire').addEventListener('touchend', (e) => {
-    e.preventDefault(); keys.shoot=false;
-});
+document.getElementById('zone-fire').addEventListener('touchstart', (e) => { e.preventDefault(); keys.shoot=true; });
+document.getElementById('zone-fire').addEventListener('touchend', (e) => { e.preventDefault(); keys.shoot=false; });
 
 document.getElementById('start-btn').addEventListener('click', () => {
     document.getElementById('start-screen').style.display='none';
     document.getElementById('mobile-controls').style.display='block';
-    Audio.init(); reset(); update();
+    Music.play(); reset(); update();
 });
 
 </script>
