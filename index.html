@@ -193,11 +193,11 @@
         <h1>FALLING<br>FOR YOU</h1>
         <div class="instructions">
             <ul>
-                <li>✨ MOVE: ARROWS / A-D</li>
-                <li>✨ SHOOT: SPACE / W / UP</li>
+                <li>✨ TAP LEFT / RIGHT TO MOVE</li>
+                <li>✨ TAP CENTER TO SHOOT</li>
                 <li>✨ GOAL: COLLECT 10 DIAMONDS</li>
-                <li>✨ TIP: SHOOT DIAMONDS TO COLLECT THEM</li>
-                <li>✨ TIP: LAND ON PLATFORMS TO REFILL AMMO</li>
+                <li>✨ TIP: LAND TO REFILL AMMO</li>
+                <li>✨ BONUS: CATCH HEARTS TO HEAL</li>
             </ul>
         </div>
         <button id="start-btn">START GAME</button>
@@ -356,9 +356,8 @@ let bullets = [];
 let particles = [];
 let texts = [];
 let gems = [];
+let hearts = []; // Heart Powerups
 let dust = [];
-let speedLines = [];
-let speedLineAlpha = 0;
 
 // Resize
 const INTERNAL_W = 320;
@@ -386,7 +385,7 @@ function reset() {
     gameState = 'PLAY';
     player.x = INTERNAL_W/2; player.y = 50; player.vx = 0; player.vy = 0;
     hp = 3; ammo = MAX_AMMO; score = 0; diamonds = 0; cameraY = 0;
-    platforms = []; enemies = []; bullets = []; particles = []; texts = []; gems = [];
+    platforms = []; enemies = []; bullets = []; particles = []; texts = []; gems = []; hearts = [];
     lastY = 200;
     platforms.push({x: INTERNAL_W/2-40, y: 150, w: 80, h: 10, type: 'safe'});
     generateLevel(cameraY + INTERNAL_H*2);
@@ -399,7 +398,7 @@ function reset() {
 function update() {
     if(gameState === 'WIN') return;
     
-    // Time Scale Logic - More subtle slowdown
+    // Time Scale Logic
     if(isQuoteActive) {
         if(timeScale > 0.3) timeScale -= 0.05;
     } else {
@@ -410,29 +409,19 @@ function update() {
     if(shake > 0) shake *= 0.9;
     if(shake < 0.5) shake = 0;
 
-    // Dust Logic (Always moving up)
+    // Dust Logic
     dust.forEach(d => {
         d.y -= d.v * (isQuoteActive ? 0.5 : 1.0);
         if(d.y < 0) { d.y = INTERNAL_H; d.x = Math.random() * INTERNAL_W; }
     });
 
     if (gameState === 'PLAY') {
-        // Speed Lines Logic
-        // Appear only when free falling (vy > 2) AND not moving horizontally AND not shooting
-        let isFreeFalling = player.vy > 2 && !keys.left && !keys.right && !keys.shoot;
-        if(isFreeFalling) {
-            speedLineAlpha = Math.min(speedLineAlpha + 0.05, 0.4);
-        } else {
-            speedLineAlpha = Math.max(speedLineAlpha - 0.1, 0);
-        }
-
         // 1. PLAYER PHYSICS
         let moveForce = MOVE_SPEED * (isQuoteActive ? 0.4 : 1.0);
         if (keys.left) player.vx -= moveForce;
         if (keys.right) player.vx += moveForce;
         player.vx *= 0.85; 
 
-        // Fix: Don't let gravity go negative or too low in slow-mo to prevent "flying"
         let gravityEffect = GRAVITY * (isQuoteActive ? 0.3 : 1.0);
         player.vy += gravityEffect;
         if(player.vy > MAX_FALL) player.vy = MAX_FALL;
@@ -455,7 +444,6 @@ function update() {
             player.cooldown = 12;
             ammo--;
             updateUI();
-            // Recoil - scaled by slow-mo to prevent flying up
             player.vy = isQuoteActive ? -1 : -3.5; 
             bullets.push({x: player.x+4, y: player.y+player.h, w: 8, h: 12, life: 40});
             shake = 3;
@@ -479,7 +467,6 @@ function update() {
             b.y += 10 * (isQuoteActive ? 0.4 : 1.0); 
             b.life--;
             
-            // Bullets vs Enemies
             for(let j=enemies.length-1; j>=0; j--) {
                 let e = enemies[j];
                 if(rectCol(b.x, b.y, b.w, b.h, e.x, e.y, e.w, e.h)) {
@@ -490,7 +477,6 @@ function update() {
                     break;
                 }
             }
-            
             // Bullets vs Gems
             for(let k=gems.length-1; k>=0; k--) {
                 let g = gems[k];
@@ -500,7 +486,6 @@ function update() {
                     break;
                 }
             }
-            
             if(b.life <= 0) bullets.splice(i, 1);
         }
 
@@ -535,10 +520,23 @@ function update() {
             }
         }
 
+        // 7. PLAYER vs HEARTS (New)
+        for(let i=hearts.length-1; i>=0; i--) {
+            let h = hearts[i];
+            if(rectCol(player.x, player.y, player.w, player.h, h.x, h.y, h.w, h.h)) {
+                hearts.splice(i, 1);
+                if(hp < 3) hp++;
+                updateUI();
+                spawnText(h.x, h.y, "❤");
+                for(let k=0; k<5; k++) spawnParticle(h.x, h.y, '#ff0055');
+            }
+        }
+
         // Cleanup & Gen
         platforms = platforms.filter(p => p.y > cameraY - 100);
         enemies = enemies.filter(e => e.y > cameraY - 100);
         gems = gems.filter(g => g.y > cameraY - 100);
+        hearts = hearts.filter(h => h.y > cameraY - 100);
         generateLevel(cameraY + INTERNAL_H + 200);
 
         // Score
@@ -578,20 +576,6 @@ function render() {
         ctx.fillRect(d.x, d.y, d.s, d.s);
     });
 
-    // Speed Lines
-    if(speedLineAlpha > 0) {
-        ctx.strokeStyle = `rgba(255, 255, 255, ${speedLineAlpha})`;
-        ctx.lineWidth = 1;
-        for(let i=0; i<15; i++) {
-            let x = (Math.sin(frame * 0.1 + i) * 0.5 + 0.5) * INTERNAL_W;
-            let y = (frame * 10 + i * 50) % INTERNAL_H;
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x, y + 40);
-            ctx.stroke();
-        }
-    }
-
     ctx.save();
     let sx = (Math.random()-0.5)*shake;
     let sy = (Math.random()-0.5)*shake;
@@ -615,6 +599,23 @@ function render() {
         ctx.lineTo(g.x, g.y + g.h/2);
         ctx.fill();
         ctx.shadowBlur = 10; ctx.shadowColor = '#00f3ff';
+        ctx.fill(); ctx.shadowBlur = 0;
+    });
+
+    // Hearts (New)
+    hearts.forEach(h => {
+        ctx.fillStyle = '#ff0055';
+        ctx.beginPath();
+        let x = h.x + h.w/2;
+        let y = h.y + h.h/2;
+        let size = h.w/2;
+        ctx.moveTo(x, y + size/2);
+        ctx.bezierCurveTo(x, y, x - size, y, x - size, y + size/2);
+        ctx.bezierCurveTo(x - size, y + size, x, y + size*1.5, x, y + size*2);
+        ctx.bezierCurveTo(x, y + size*1.5, x + size, y + size, x + size, y + size/2);
+        ctx.bezierCurveTo(x + size, y, x, y, x, y + size/2);
+        ctx.fill();
+        ctx.shadowBlur = 10; ctx.shadowColor = '#ff0055';
         ctx.fill(); ctx.shadowBlur = 0;
     });
 
@@ -647,6 +648,38 @@ function render() {
         ctx.restore();
     }
 
+    // NEW: Speed Lines Above Head
+    // Only appear when falling fast, not shooting, not moving side too much
+    if (player.vy > 3 && !keys.shoot) {
+        ctx.save();
+        ctx.translate(player.x + player.w/2, player.y);
+        let alpha = Math.min((player.vy - 3) / 6, 0.8);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.lineWidth = 1;
+        
+        let len = (player.vy - 3) * 6; // Dynamic length
+        
+        // Center Line
+        ctx.beginPath();
+        ctx.moveTo(0, -5);
+        ctx.lineTo(0, -5 - len);
+        ctx.stroke();
+
+        // Left Line
+        ctx.beginPath();
+        ctx.moveTo(-5, -2);
+        ctx.lineTo(-5, -2 - len * 0.6);
+        ctx.stroke();
+
+        // Right Line
+        ctx.beginPath();
+        ctx.moveTo(5, -2);
+        ctx.lineTo(5, -2 - len * 0.6);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
     // Particles & Text
     particles.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 4, 4); });
     ctx.font = '10px "Press Start 2P"';
@@ -661,9 +694,16 @@ function generateLevel(targetY) {
         lastY += 65 + Math.random()*45;
         let r = Math.random();
         
+        // Gems
         if(Math.random() < 0.15) {
              let x = Math.random()*(INTERNAL_W-20);
              gems.push({x, y: lastY - 45, w: 16, h: 16});
+        }
+
+        // Hearts (Rare)
+        if(Math.random() < 0.03) {
+             let x = Math.random()*(INTERNAL_W-20);
+             hearts.push({x, y: lastY - 65, w: 10, h: 10});
         }
 
         if(r < 0.7) {
@@ -690,7 +730,7 @@ const words = ["WOW!", "NICE!", "EPIC!", "GREAT!", "BOOM!", "COOL!", "LOVELY!"];
 function killEnemy(e, idx) {
     enemies.splice(idx, 1);
     shake = 6;
-    spawnText(e.x, e.y);
+    spawnText(e.x, e.y, words[Math.floor(Math.random()*words.length)]);
     for(let i=0; i<10; i++) spawnParticle(e.x+e.w/2, e.y+e.h/2, '#ff0055');
 }
 
@@ -718,8 +758,8 @@ function collectDiamond(idx) {
     if(diamonds >= WIN_SCORE) winGame();
 }
 
-function spawnText(x, y) {
-    texts.push({x, y, str: words[Math.floor(Math.random()*words.length)], life: 40});
+function spawnText(x, y, str) {
+    texts.push({x, y, str: str, life: 40});
 }
 
 function spawnParticle(x, y, c) {
