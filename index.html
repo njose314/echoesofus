@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Falling For You - Finale</title>
+<title>Falling For You - Polished</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -52,54 +52,50 @@
         display: flex;
         justify-content: space-between;
         color: white;
-        text-shadow: 2px 2px #00f3ff;
-        font-size: 14px;
+        text-shadow: 2px 2px #ff0055;
+        font-size: 12px;
         margin-bottom: 10px;
     }
 
     /* Bars */
     .bar-container {
-        width: 100px; height: 10px; background: #333; border: 2px solid white; margin-bottom: 5px;
+        width: 120px; height: 12px; background: #222; border: 2px solid #00f3ff; margin-bottom: 5px;
+        position: relative;
     }
     #ammo-fill { width: 100%; height: 100%; background: #ff0055; transition: width 0.1s; }
     
     /* Diamond Counter */
     #diamond-tracker {
-        color: #00f3ff; text-align: right; font-size: 12px; margin-top: 5px;
+        color: #00f3ff; text-align: right; font-size: 10px; margin-top: 5px;
     }
 
     /* FLOATING QUOTE OVERLAY */
     #floating-quote-container {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 40%;
+        left: 0; 
+        width: 100%;
+        text-align: center;
         pointer-events: none;
-        z-index: 20;
+        z-index: 200;
         opacity: 0;
-        transition: opacity 0.3s ease-in-out;
+        transform: scale(0.8);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        justify-content: center;
     }
 
     #floating-quote-text {
-        background: rgba(0, 0, 0, 0.95);
-        border: 3px solid #00f3ff;
+        background: rgba(0, 0, 0, 0.85);
+        border: 4px double #00f3ff;
         color: #fff;
         padding: 20px 30px;
-        border-radius: 0;
-        font-size: 11px;
-        line-height: 1.8;
-        max-width: 280px;
-        box-shadow: 0 0 30px #00f3ff, inset 0 0 20px rgba(0, 243, 255, 0.2);
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 85%;
+        box-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
         text-shadow: 2px 2px 0 #ff0055;
-        text-align: center;
-        animation: glitch 0.3s infinite;
-    }
-
-    @keyframes glitch {
-        0%, 100% { transform: translate(0, 0); }
-        25% { transform: translate(-2px, 2px); }
-        50% { transform: translate(2px, -2px); }
-        75% { transform: translate(-2px, -2px); }
     }
 
     /* Screens */
@@ -108,27 +104,27 @@
         background: rgba(5, 5, 5, 0.95);
         display: flex; flex-direction: column;
         justify-content: center; align-items: center;
-        z-index: 100; pointer-events: auto;
+        z-index: 1000; pointer-events: auto;
         text-align: center;
     }
     .hidden { display: none !important; }
 
     h1 {
-        color: #00f3ff; font-size: 30px; line-height: 1.5; margin-bottom: 30px;
+        color: #00f3ff; font-size: 28px; line-height: 1.4; margin-bottom: 20px;
         text-shadow: 4px 4px #ff0055;
     }
     
-    p { color: #ccc; font-size: 12px; line-height: 1.8; max-width: 80%; margin-bottom: 20px; }
+    p { color: #ccc; font-size: 10px; line-height: 1.8; max-width: 80%; margin-bottom: 20px; }
 
     button {
         background: #00f3ff; border: 4px solid #fff; color: #000;
-        font-family: 'Press Start 2P', cursive; padding: 20px 40px;
-        font-size: 16px; cursor: pointer; transition: transform 0.1s;
+        font-family: 'Press Start 2P', cursive; padding: 15px 30px;
+        font-size: 14px; cursor: pointer; transition: transform 0.1s;
         box-shadow: 0 6px #008899; margin-top: 20px;
     }
     button:active { transform: translateY(6px); box-shadow: 0 0 #008899; }
     
-    /* Touch Zones */
+    /* Mobile Controls */
     #mobile-controls {
         position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 50; display: none;
     }
@@ -156,7 +152,7 @@
     </div>
 
     <div id="floating-quote-container">
-        <div id="floating-quote-text">SYSTEM MESSAGE...</div>
+        <div id="floating-quote-text">INITIALIZING...</div>
     </div>
 
     <div id="mobile-controls">
@@ -168,24 +164,20 @@
     <div id="start-screen" class="screen">
         <h1>FALLING<br>FOR YOU</h1>
         <p>Collect 10 Diamonds to Win Her Heart.</p>
-        <p style="font-size: 10px; margin-top: 10px;">Arrow Keys + Space / Touch Controls</p>
-        <button id="start-btn">JUMP IN</button>
-        <p style="font-size: 10px; margin-top: 20px; color: #ff0055;">(Sound ON for Techno)</p>
+        <button id="start-btn">START GAME</button>
+        <p style="font-size: 8px; margin-top: 20px; color: #ff0055;">ARROWS/SPACE TO MOVE & SHOOT</p>
     </div>
 
     <div id="win-screen" class="screen hidden">
-        <h1 style="color: #ff0055;">MISSION COMPLETE</h1>
-        <p>You collected all 10 diamonds!</p>
-        <p style="color: #00f3ff; margin-top: 20px; font-size: 11px; line-height: 1.6;">
-            "Just like in this game, I will always catch you when you fall.<br><br>
-            Happy Valentine's Day. 💎"
-        </p>
-        <button id="restart-btn">PLAY AGAIN</button>
+        <h1 style="color: #ff0055;">YOU WON MY HEART!</h1>
+        <p>You collected all 10 fragments of my affection.</p>
+        <div id="final-quote" style="color: #00f3ff; margin: 20px 0; font-size: 12px; line-height: 1.6; max-width: 85%;"></div>
+        <button onclick="location.reload()">PLAY AGAIN</button>
     </div>
 </div>
 
-<audio id="bgm" loop>
-    <source src="https://archive.org/download/NewWaveOutrun/02DaftPunkGetstucky.mp3" type="audio/mpeg">
+<audio id="bgm" loop preload="auto">
+    <source src="https://archive.org/download/essential-keygen-music/01%20-%20rez%2Bkenet%20-%20unreeeal%20superhero%203.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -193,254 +185,132 @@
  * --- 200 GEEKY/FLIRTY LINES DATABASE ---
  */
 const LOVE_DB = [
-    "You're the CSS to my HTML.",
-    "My heart beats at 144Hz for you.",
-    "You're my favorite notification.",
-    "I'd never sudo rm -rf you.",
-    "You're 100% my type.",
-    "Are you a keyboard? Because you're my type.",
-    "My love for you is an infinite loop.",
-    "You auto-complete me.",
-    "You're the root of my heart.",
-    "I want to commit to you.",
-    "Let's merge our branches forever.",
-    "You're high priority in my queue.",
-    "No lag when I'm with you.",
-    "You optimize my life's algorithm.",
-    "My dopamine overflows for you.",
-    "You're my production environment.",
-    "I'm compiled to love you.",
-    "Access granted: Always and forever.",
-    "You're the only variable I need.",
-    "Garbage collection deleted my exes.",
-    "Deploying hugs to your server...",
-    "You're my favorite API endpoint.",
-    "Let's pair program life together.",
-    "You're my source code soulmate.",
-    "System status: Deeply in love.",
-    "You have full admin rights to my heart.",
-    "My firewall is down for you.",
-    "You're my steady state solution.",
-    "I'm stuck in your gravitational orbit.",
-    "Gravity points directly to you.",
-    "You shine brighter than any RGB.",
-    "You're my safe house in the storm.",
-    "Level 100 Boss of beauty unlocked.",
-    "I'd pause my game for you.",
-    "You're the ultimate legendary loot.",
-    "My player 2 forever and always.",
-    "Game over? Never with you here.",
-    "You unlock my best self daily.",
-    "I'm buffering... just staring at you.",
-    "High fidelity love connection.",
-    "You render perfectly in my world.",
-    "No visual artifacts in your beauty.",
-    "You're my GPU (Gorgeous Person Unit).",
-    "Frame rate: Infinitely smooth with you.",
-    "Ping: 0ms to your heart.",
-    "Packet loss: 0% with our connection.",
-    "Connection: SSL secured forever.",
-    "Bandwidth: Unlimited for us.",
-    "You're my cloud storage backup.",
-    "I'm uploading my heart to you.",
-    "Sync complete. Hearts aligned.",
-    "You're my disaster recovery plan.",
-    "Restore point: This moment with you.",
-    "You're my /home directory.",
-    "cd /heart/you",
-    "mkdir our_future",
-    "touch forever.love",
-    "chmod 777 my_heart",
-    "You have permission to everything.",
-    "Execute order: Kiss me now.",
-    "Runtime: Forever with you.",
-    "Exception handled: Caught by you.",
-    "Catch block: My arms around you.",
-    "Try: Us together forever.",
-    "while(alive) { love(you); }",
-    "if(you) { smile(); }",
-    "return true; // always",
-    "boolean isHappy = withYou;",
-    "String myLove = 'You forever';",
-    "Array of beautiful memories.",
-    "Object oriented towards your love.",
-    "Functional relationship goals.",
-    "Agile romance methodology.",
-    "Sprint planning: Date night tonight.",
-    "Daily standup: Morning kisses.",
-    "Retrospective: You're still amazing.",
-    "Jira ticket: Need more cuddles.",
-    "Status: Completed with excellence.",
-    "Blocker: Missing you right now.",
-    "Bug free love connection.",
-    "Feature request: More hugs please.",
-    "Patch notes: Loves you even more.",
-    "Version 1.0 upgraded to 2.0.",
-    "Upgrade complete. Love enhanced.",
-    "Installing love.exe... Done.",
-    "Download complete. Opening heart.",
-    "Run file? Yes, definitely yes.",
-    "Run as administrator of my heart.",
-    "Warning: Dangerously attractive.",
-    "Error 404: Flaws not found anywhere.",
-    "Server status: Online for you.",
-    "Database: Connected to your soul.",
-    "Query: SELECT * FROM world WHERE name = 'You';",
-    "Result: 1 perfect match found.",
-    "Index created on HeartID.",
-    "Primary Key: You and only you.",
-    "Foreign Key: Me to you.",
-    "JOIN us together forever.",
-    "COMMIT to this transaction.",
-    "ROLLBACK? Absolutely never.",
-    "ACID compliant love guaranteed.",
-    "Scalable affection architecture.",
-    "Load balanced between our hearts.",
-    "Microservices: Hugs, Kisses, Love.",
-    "Monolithic love structure.",
-    "Docker container: Our relationship.",
-    "Kubernetes cluster of hearts.",
-    "Pod status: Running perfectly.",
-    "Logs: I love you infinitely.",
-    "console.log('You are incredibly cute');",
-    "print('Hello Beautiful Person');",
-    "echo 'I love you endlessly';",
-    "System.out.println('Be mine forever');",
-    "alert('You stole my heart');",
-    "prompt('Kiss me now?');",
-    "confirm('Forever together?');",
-    "body { background: You; }",
-    "div { border: Love; }",
-    "span { color: Passion; }",
-    "font-family: 'Your Handwriting';",
-    "text-align: center; // on you",
-    "margin: 0; padding: all-my-love;",
-    "display: flex; // flexible for you",
-    "justify-content: Forever;",
-    "align-items: Together always;",
-    "z-index: 9999; // top priority",
-    "opacity: 100%; // completely yours",
-    "visibility: Always visible to you;",
-    "transform: rotate(my-heart);",
-    "transition: forever ease-in;",
-    "animation: heartbeat infinite;",
-    "@keyframes falling-for-you {}",
-    "Media query: You in any screen size.",
-    "Responsive love for all devices.",
-    "Mobile first approach to us.",
-    "Desktop, tablet, phone compatible.",
-    "Cross-browser love compatibility.",
-    "Even IE6 compatible (that strong).",
-    "HTTPS secure connection established.",
-    "SSL certificate: Valid forever.",
-    "Domain registered: Us.love",
-    "Subdomain: Our beautiful life.",
-    "Path: /future/together",
-    "Query string: ?love=infinite",
-    "<a href='You'>My anchor</a>",
-    "<img src='YourSmile.jpg' alt='Perfect'>",
-    "<input type='heart' value='yours'>",
-    "<button onclick='kiss()'>Click me</button>",
-    "<form method='POST' action='Love'>",
-    "<script src='Our-Romance.js'></script>",
-    "<link rel='stylesheet' href='Us.css'>",
-    "<meta name='Love' content='You'>",
-    "<title>Us Forever</title>",
-    "<header>You're my header</header>",
-    "<footer>I'm your footer</footer>",
-    "<main>Our life together</main>",
-    "<section>Dreams and hopes</section>",
-    "<article>Love story in progress</article>",
-    "<aside>Fun adventures await</aside>",
-    "<nav>You're my direction</nav>",
-    "<canvas>Paint our memories</canvas>",
-    "SVG: Scalable Vector of my love.",
-    "Pixel perfect love rendering.",
-    "Retina display optimized for you.",
-    "4K Ultra HD romance footage.",
-    "Dolby Surround Sound of love.",
-    "IMAX theatrical experience with you.",
-    "Blockbuster hit of the century.",
-    "Oscar winner: Best Love Story.",
-    "Best Picture: Our Life Together.",
-    "Best Actress: You, always you.",
-    "Best Actor: Lucky me with you.",
-    "Director: Destiny brought us.",
-    "Producer: The universe itself.",
-    "Screenplay: Still being written.",
-    "Improvisation: Our best moments.",
-    "Scene 1, Take 1: Action!",
-    "Cut! Actually, never cut. Keep rolling.",
-    "Perfect take every single time.",
-    "Encore performance requested.",
-    "Standing ovation for us.",
-    "Curtain call: We take a bow.",
-    "Backstage pass: VIP access granted.",
-    "All-access pass to my heart.",
-    "Tour bus: Our journey together.",
-    "Road trip: Adventure awaits us.",
-    "GPS coordinates: Set to you.",
-    "Navigation locked on your heart.",
-    "Destination reached: Right here with you.",
-    "You have arrived at happiness.",
-    "Welcome home to my heart.",
-    "So glad you're here with me.",
-    "Stay forever, please don't go.",
-    "I want to explore your caves.",
-    "Let's debug life together forever.",
-    "You're my infinite recursion of joy.",
-    "Stack overflow: Too much love.",
-    "Heap memory: Full of you.",
-    "Pointer to happiness: You.",
-    "Malloc(love) // allocated forever",
-    "Free()? Never freeing you.",
-    "Segmentation fault: Can't live without you.",
-    "Core dumped: My heart for you.",
-    "Kernel panic: When you're away.",
-    "Fork(): Let's create our future.",
-    "Thread-safe love guaranteed.",
-    "Race condition: Racing to you.",
-    "Deadlock prevented: You're here.",
-    "Mutex locked on our love.",
-    "Semaphore signaled: I love you.",
-    "Critical section: You in my arms."
+    "I want to explore your caves.", "Are you a keyboard? Because you're my type.", "You are the CSS to my HTML.",
+    "My heart beats at 144Hz for you.", "You are my favorite notification.", "I'd never sudo rm -rf you.",
+    "You are 100% my type.", "My love for you is an infinite loop.", "You auto-complete me.",
+    "You are the root of my heart.", "I want to commit to you.", "Let's merge our branches.",
+    "You are high priority.", "No lag when I'm with you.", "You optimize my life.",
+    "My dopamine overflows for you.", "You are my production environment.", "I'm compiled to love you.",
+    "Access granted: Always.", "You are the only variable I need.", "Garbage collection deleted my exes.",
+    "Deploying hugs...", "You're my favorite API.", "Let's pair program life.",
+    "You are my source code.", "System status: In love.", "You have full admin rights.",
+    "My firewall is down for you.", "You are my steady state.", "I'm stuck in your orbit.",
+    "Gravity points to you.", "You shine brighter than RGB.", "You are my safe house.",
+    "Level 100 Boss of beauty.", "I'd pause my game for you.", "You are the ultimate loot.",
+    "My player 2 forever.", "Game over? Never with you.", "You unlock my best self.",
+    "I'm buffering... staring at you.", "High fidelity love.", "You render perfectly.",
+    "No artifacts in your beauty.", "You are my GPU (Gorgeous Person Unit).", "Frame rate: Smooth.",
+    "Ping: 0ms.", "Packet loss: 0%.", "Connection: Secure.", "Bandwidth: Unlimited.",
+    "You are my cloud storage.", "I'm uploading my heart.", "Sync complete.",
+    "You are my backup plan.", "Restore point created.", "You are my home directory.",
+    "cd /home/you", "mkdir love", "touch heart", "chmod 777 heart",
+    "You have permission to everything.", "Execute order: Kiss.", "Runtime: Forever.",
+    "Exception handled: You.", "Catch block: Me.", "Try: Us.",
+    "While(alive) { love(you); }", "If (you) { smile(); }", "Return true;",
+    "Boolean isHappy = true;", "String myLove = 'You';", "Array of memories.",
+    "Object oriented love.", "Functional relationship.", "Agile romance.",
+    "Sprint planning: Date night.", "Daily standup: Kiss.", "Retrospective: You're amazing.",
+    "Jira ticket: Cuddle.", "Status: Done.", "Blocker: Miss you.",
+    "Bug free love.", "Feature request: More hugs.", "Patch notes: Loves you more.",
+    "Version 1.0 -> 2.0.", "Upgrade complete.", "Installing love...",
+    "Download finished.", "Open file?", "Yes.", "Run as administrator.",
+    "Warning: Too hot.", "Error 404: Flaws not found.", "Server status: Online.",
+    "Database connected.", "Query: Select * from World where Name = You.", "Result: 1 row found.",
+    "Index on HeartID.", "Primary Key: You.", "Foreign Key: Me.",
+    "Join Table: Us.", "Commit transaction.", "Rollback? Never.",
+    "ACID compliant love.", "Scalable affection.", "Load balanced.",
+    "Microservices: Hugs, Kisses, Talks.", "Monolith of love.", "Docker container: Us.",
+    "Kubernetes cluster of hearts.", "Pod status: Running.", "Log: Love you.",
+    "Console.log('You are cute');", "Print('Hello Beautiful');", "Echo 'I love you';",
+    "System.out.println('Be mine');", "Alert('You stole my heart');", "Prompt('Kiss me?');",
+    "Confirm('Forever?');", "Body { background: You; }", "Div { border: Love; }",
+    "Span { color: Passion; }", "Font-family: 'Your Handwriting';", "Text-align: Center;",
+    "Margin: 0;", "Padding: All;", "Display: Flex;",
+    "Justify-content: Love;", "Align-items: Together;", "Z-index: 9999;",
+    "Opacity: 100%.", "Visibility: Visible.", "Transform: Rotate(Heart);",
+    "Transition: Forever ease-in;", "Animation: Beat infinite;", "Keyframes: Love.",
+    "You are my favorite shortcut.", "Ctrl+C my heart, Ctrl+V it in yours.", "You're the only one in my whitelist.",
+    "I'd go through any firewall for you.", "My heart is open-source for you.", "You're my private key.",
+    "Let's establish a secure handshake.", "You've got 100% uptime in my mind.", "You're the top result in my search.",
+    "I'd never clear my cache of you.", "You're my favorite Easter egg.", "Our chemistry is better than a lab.",
+    "You're my favorite line of code.", "I'd debug any problem for you.", "You're the master branch of my life.",
+    "Let's sync our heartbeats.", "You're the 'gold' in my 'master'.", "I'd give you all my bandwidth.",
+    "You're my favorite syntax.", "No errors found in your smile.", "You're my favorite protocol.",
+    "I'd wait for your callback forever.", "You're my favorite data structure.", "I'd traverse any tree for you.",
+    "You're my favorite algorithm.", "I'd sort my life for you.", "You're my favorite bit.",
+    "I'd never bit-shift you away.", "You're my favorite byte.", "I'd take a byte out of your heart.",
+    "You're my favorite pixel.", "You're my favorite frame.", "I'd never drop a frame of you.",
+    "You're my favorite texture.", "You're my favorite shader.", "You're my favorite vertex.",
+    "I'd never rotate away from you.", "You're my favorite vector.", "I'd follow your direction anywhere.",
+    "You're my favorite scalar.", "You've scaled my love to the max.", "You're my favorite matrix.",
+    "I'd enter your world anytime.", "You're my favorite dimension.", "You're my 4th dimension.",
+    "You're my favorite constant.", "You're my favorite literal.", "You're my favorite expression.",
+    "I'd evaluate you as perfect.", "You're my favorite statement.", "I'd execute your every wish.",
+    "You're my favorite comment.", "I'd never ignore you.", "You're my favorite tag.",
+    "I'd always close my tags for you.", "You're my favorite attribute.", "You've got the best properties.",
+    "You're my favorite selector.", "I'd always choose you.", "You're my favorite event.",
+    "I'd always listen for you.", "You're my favorite handler.", "You handle my heart so well.",
+    "You're my favorite promise.", "I'll always resolve for you.", "You're my favorite async.",
+    "I'd wait for you forever.", "You're my favorite await.", "You're worth the wait.",
+    "You're my favorite export.", "I'd import you into my life.", "You're my favorite module.",
+    "You're my favorite package.", "I'd always install you.", "You're my favorite dependency.",
+    "I'm dependent on your love.", "You're my favorite script.", "You've written our future.",
+    "You're my favorite style.", "You've got the best layout.", "You're my favorite font.",
+    "You're my favorite color.", "You're my favorite gradient.", "You're my favorite shadow.",
+    "I'd always follow you.", "You're my favorite border.", "I'd never cross yours.",
+    "You're my favorite margin.", "I'd give you all the space you need.", "You're my favorite padding.",
+    "I'd always protect you.", "You're my favorite display.", "I'd always look at you.",
+    "You're my favorite position.", "I'd always stay by you.", "You're my favorite overflow.",
+    "My love for you overflows.", "You're my favorite float.", "I'd never let you sink.",
+    "You're my favorite clear.", "You've cleared my mind.", "You're my favorite z-index.",
+    "You're on top of my world.", "You're my favorite opacity.", "I see right through to your heart.",
+    "You're my favorite visibility.", "I'll always see you.", "You're my favorite filter.",
+    "You're perfect as you are.", "You're my favorite backdrop.", "You're the scene of my dreams.",
+    "You're my favorite clip.", "I'll always keep you.", "You're my favorite mask.",
+    "I'll always reveal my love.", "You're my favorite path.", "I'll always walk with you.",
+    "You're my favorite shape.", "You're the perfect fit.", "You're my favorite transform.",
+    "You've changed my life.", "You're my favorite transition.", "I'll always evolve with you.",
+    "You're my favorite animation.", "You've brought me to life.", "You're my favorite keyframe.",
+    "You're the highlight of my story.", "You're my favorite timing.", "You're always on time.",
+    "You're my favorite delay.", "I'd wait for you any day.", "You're my favorite iteration.",
+    "I'll love you again and again.", "You're my favorite direction.", "You're my north star.",
+    "You're my favorite fill.", "You've filled my heart.", "You're my favorite mode.",
+    "I'm always in love mode.", "You're my favorite play.", "Let's play for life.",
+    "You're my favorite pause.", "I'd stop time for you.", "You're my favorite stop.",
+    "I'll never stop loving you.", "You're my favorite start.", "Let's start our forever."
 ];
 
-/** 
- * AUDIO ENGINE
- */
+/** * AUDIO ENGINE */
 const Music = document.getElementById('bgm');
-Music.volume = 0.5;
+Music.volume = 0.4;
 
-/** 
- * GAME CONSTANTS 
- */
+/** * GAME CONSTANTS */
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const GRAVITY = 0.5;
-const MAX_FALL = 10;
-const SHOOT_FORCE = -4; 
-const MOVE_SPEED = 0.8;
+const GRAVITY = 0.4;
+const MAX_FALL = 8;
+const MOVE_SPEED = 0.7;
 const MAX_AMMO = 8;
 const WIN_SCORE = 10;
 
 let gameState = 'MENU'; 
-let score = 0;
+let score = 0; 
 let diamonds = 0; 
 let hp = 3;
 let ammo = MAX_AMMO;
 let frame = 0;
 let shake = 0;
-let globalTimeScale = 1.0; 
+let timeScale = 1.0; 
 let cameraY = 0;
 let isQuoteActive = false;
+let lastY = 200;
 
 // Inputs
 const keys = { left: false, right: false, shoot: false };
 
 // Entities
-const player = { x: 0, y: 0, w: 16, h: 24, vx: 0, vy: 0, facing: 1, cooldown: 0, iframes: 0 };
+const player = { x: 0, y: 0, w: 16, h: 24, vx: 0, vy: 0, cooldown: 0, iframes: 0 };
 let platforms = [];
 let enemies = [];
 let bullets = [];
@@ -462,207 +332,163 @@ handleResize();
 
 function reset() {
     gameState = 'PLAY';
-    player.x = INTERNAL_W/2; 
-    player.y = 50; 
-    player.vx = 0; 
-    player.vy = 0;
-    player.iframes = 0;
-    player.cooldown = 0;
-    hp = 3; 
-    ammo = MAX_AMMO; 
-    score = 0; 
-    diamonds = 0; 
-    cameraY = 0;
-    frame = 0;
-    shake = 0;
-    globalTimeScale = 1.0;
-    isQuoteActive = false;
-    
-    platforms = []; 
-    enemies = []; 
-    bullets = []; 
-    particles = []; 
-    texts = []; 
-    gems = [];
-    
-    // Reset level generation
+    player.x = INTERNAL_W/2; player.y = 50; player.vx = 0; player.vy = 0;
+    hp = 3; ammo = MAX_AMMO; score = 0; diamonds = 0; cameraY = 0;
+    platforms = []; enemies = []; bullets = []; particles = []; texts = []; gems = [];
     lastY = 200;
-    
-    // Starting platform
     platforms.push({x: INTERNAL_W/2-40, y: 150, w: 80, h: 10, type: 'safe'});
-    
-    // Generate initial level
     generateLevel(cameraY + INTERNAL_H*2);
-    
     updateUI();
     document.getElementById('floating-quote-container').style.opacity = 0;
+    document.getElementById('floating-quote-container').style.transform = 'scale(0.8)';
 }
 
-/** 
- * MAIN UPDATE LOOP 
- */
+/** * LOGIC */
 function update() {
-    if(gameState === 'WIN' || gameState === 'MENU') return;
+    if(gameState === 'WIN') return;
     
-    // Time Scale Logic - affects EVERYTHING now
+    // Time Scale Logic - Only affect game speed, not movement logic
     if(isQuoteActive) {
-        if(globalTimeScale > 0.2) globalTimeScale -= 0.05;
+        if(timeScale > 0.1) timeScale -= 0.1;
     } else {
-        if(globalTimeScale < 1.0) globalTimeScale += 0.05;
-        if(globalTimeScale > 1.0) globalTimeScale = 1.0;
+        if(timeScale < 1.0) timeScale += 0.05;
+        if(timeScale > 1.0) timeScale = 1.0;
     }
 
-    // Shake Decay
     if(shake > 0) shake *= 0.9;
     if(shake < 0.5) shake = 0;
 
-    // 1. PLAYER PHYSICS
-    if (keys.left) player.vx -= MOVE_SPEED * globalTimeScale;
-    if (keys.right) player.vx += MOVE_SPEED * globalTimeScale;
-    player.vx *= 0.85; 
+    if (gameState === 'PLAY') {
+        // 1. PLAYER PHYSICS
+        let currentMoveSpeed = MOVE_SPEED * (isQuoteActive ? 0.3 : 1.0);
+        if (keys.left) player.vx -= currentMoveSpeed;
+        if (keys.right) player.vx += currentMoveSpeed;
+        player.vx *= 0.85; 
 
-    player.vy += GRAVITY * globalTimeScale;
-    if(player.vy > MAX_FALL) player.vy = MAX_FALL;
+        player.vy += GRAVITY * (isQuoteActive ? 0.1 : 1.0);
+        if(player.vy > MAX_FALL) player.vy = MAX_FALL;
 
-    player.x += player.vx * globalTimeScale;
-    player.y += player.vy * globalTimeScale;
+        player.x += player.vx;
+        player.y += player.vy;
 
-    // Wrap
-    if(player.x < -player.w) player.x = INTERNAL_W;
-    if(player.x > INTERNAL_W) player.x = -player.w;
+        // Wrap
+        if(player.x < -player.w) player.x = INTERNAL_W;
+        if(player.x > INTERNAL_W) player.x = -player.w;
 
-    // Camera
-    let targetY = player.y - INTERNAL_H * 0.3;
-    if(targetY > cameraY) cameraY += (targetY - cameraY) * 0.1;
+        // Camera
+        let targetCameraY = player.y - INTERNAL_H * 0.3;
+        if(targetCameraY > cameraY) cameraY += (targetCameraY - cameraY) * 0.1;
 
-    // 2. SHOOTING 
-    if(player.cooldown > 0) player.cooldown--;
-    
-    if(keys.shoot && player.cooldown <= 0 && ammo > 0) {
-        player.cooldown = 10;
-        ammo--;
-        updateUI();
-        player.vy = -4; 
-        bullets.push({x: player.x+4, y: player.y+player.h, w: 8, h: 12, life: 30});
-        shake = 3;
-        for(let i=0; i<3; i++) spawnParticle(player.x+8, player.y+12, '#ff0055');
-    }
+        // 2. SHOOTING 
+        if(player.cooldown > 0) player.cooldown--;
+        
+        if(keys.shoot && player.cooldown <= 0 && ammo > 0) {
+            player.cooldown = 12;
+            ammo--;
+            updateUI();
+            player.vy = -3.5; 
+            bullets.push({x: player.x+4, y: player.y+player.h, w: 8, h: 12, life: 40});
+            shake = 3;
+            for(let i=0; i<3; i++) spawnParticle(player.x+8, player.y+12, '#ff0055');
+        }
 
-    // 3. COLLISION WITH PLATFORMS
-    platforms.forEach(p => {
-        if(rectCol(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)) {
-            if(player.vy > 0 && player.y+player.h-player.vy*globalTimeScale <= p.y + 10) {
-                player.y = p.y - player.h;
-                player.vy = 0;
-                if(ammo < MAX_AMMO) { 
-                    ammo = MAX_AMMO; 
-                    updateUI(); 
+        // 3. COLLISION - PLATFORMS
+        platforms.forEach(p => {
+            if(rectCol(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)) {
+                if(player.vy > 0 && player.y+player.h-player.vy <= p.y + 10) {
+                    player.y = p.y - player.h;
+                    player.vy = 0;
+                    if(ammo < MAX_AMMO) { ammo = MAX_AMMO; updateUI(); }
                 }
             }
-        }
-    });
+        });
 
-    // 4. UPDATE ENEMIES WITH MOTION
-    enemies.forEach((e, idx) => {
-        // Apply global time scale to enemy movement
-        if(e.type === 'floater') {
-            e.x = e.startX + Math.sin((frame * globalTimeScale) * 0.05) * 40;
-        } else if(e.type === 'walker') {
-            if(!e.direction) e.direction = 1;
-            e.x += e.direction * 1.5 * globalTimeScale;
-            if(e.x < e.startX - 30 || e.x > e.startX + 30) e.direction *= -1;
-        } else if(e.type === 'block') {
-            // Vertical bobbing motion
-            if(!e.startY) e.startY = e.y;
-            e.y = e.startY + Math.sin((frame * globalTimeScale) * 0.03) * 15;
+        // 4. BULLETS vs ENEMIES & GEMS
+        for(let i=bullets.length-1; i>=0; i--) {
+            let b = bullets[i];
+            b.y += 10 * (isQuoteActive ? 0.2 : 1.0); 
+            b.life--;
+            
+            // Bullets vs Enemies
+            for(let j=enemies.length-1; j>=0; j--) {
+                let e = enemies[j];
+                if(rectCol(b.x, b.y, b.w, b.h, e.x, e.y, e.w, e.h)) {
+                    e.hp--;
+                    b.life = 0;
+                    spawnParticle(b.x, b.y, '#fff');
+                    if(e.hp <= 0) killEnemy(e, j);
+                    break;
+                }
+            }
+            
+            // Bullets vs Gems
+            for(let k=gems.length-1; k>=0; k--) {
+                let g = gems[k];
+                if(rectCol(b.x, b.y, b.w, b.h, g.x, g.y, g.w, g.h)) {
+                    b.life = 0;
+                    collectDiamond(k);
+                    break;
+                }
+            }
+            
+            if(b.life <= 0) bullets.splice(i, 1);
         }
-    });
 
-    // 5. BULLETS vs ENEMIES AND DIAMONDS
-    for(let i=bullets.length-1; i>=0; i--) {
-        let b = bullets[i];
-        b.y += 15 * globalTimeScale; 
-        b.life--;
+        // 5. PLAYER vs ENEMIES
+        if(player.iframes > 0) player.iframes--;
         
-        // Bullets hit enemies
-        for(let j=enemies.length-1; j>=0; j--) {
-            let e = enemies[j];
-            if(rectCol(b.x, b.y, b.w, b.h, e.x, e.y, e.w, e.h)) {
-                e.hp--;
-                b.life = 0;
-                spawnParticle(b.x, b.y, '#fff');
-                if(e.hp <= 0) killEnemy(e, j);
-                break;
+        enemies.forEach((e, idx) => {
+            // Movement for all enemies
+            let speed = (e.type === 'block' ? 0.5 : 1.2) * (isQuoteActive ? 0.2 : 1.0);
+            e.x += Math.sin(frame * 0.02 + e.offset) * speed;
+
+            if(rectCol(player.x, player.y, player.w, player.h, e.x, e.y, e.w, e.h)) {
+                if(player.vy > 0 && player.y+player.h-player.vy <= e.y + e.h*0.5) {
+                    player.vy = -6; 
+                    ammo = MAX_AMMO; updateUI(); 
+                    killEnemy(e, idx);
+                } else if(player.iframes <= 0) {
+                    hp--;
+                    player.iframes = 60;
+                    player.vy = -5;
+                    shake = 10;
+                    updateUI();
+                    if(hp <= 0) gameOver();
+                }
+            }
+        });
+
+        // 6. PLAYER vs GEMS
+        for(let i=gems.length-1; i>=0; i--) {
+            let g = gems[i];
+            if(rectCol(player.x, player.y, player.w, player.h, g.x, g.y, g.w, g.h)) {
+                collectDiamond(i);
             }
         }
-        
-        // Bullets hit diamonds
-        for(let j=gems.length-1; j>=0; j--) {
-            let g = gems[j];
-            if(rectCol(b.x, b.y, b.w, b.h, g.x, g.y, g.w, g.h)) {
-                b.life = 0;
-                collectDiamond(j);
-                break;
-            }
-        }
-        
-        if(b.life <= 0) bullets.splice(i, 1);
+
+        // Cleanup & Gen
+        platforms = platforms.filter(p => p.y > cameraY - 100);
+        enemies = enemies.filter(e => e.y > cameraY - 100);
+        gems = gems.filter(g => g.y > cameraY - 100);
+        generateLevel(cameraY + INTERNAL_H + 200);
+
+        // Score
+        let depth = Math.floor(player.y/10);
+        if(depth > score) { score = depth; document.getElementById('depth').innerText = score; }
+
+        // Particles & Texts
+        particles.forEach((p,i) => {
+            p.x += p.vx * (isQuoteActive ? 0.2 : 1.0); 
+            p.y += p.vy * (isQuoteActive ? 0.2 : 1.0); 
+            p.life--;
+            if(p.life<=0) particles.splice(i,1);
+        });
+        texts.forEach((t,i) => {
+            t.y -= 1 * (isQuoteActive ? 0.2 : 1.0); 
+            t.life--;
+            if(t.life<=0) texts.splice(i,1);
+        });
     }
-
-    // 6. PLAYER vs ENEMIES
-    if(player.iframes > 0) player.iframes--;
-    
-    enemies.forEach((e, idx) => {
-        if(rectCol(player.x, player.y, player.w, player.h, e.x, e.y, e.w, e.h)) {
-            if(player.vy > 0 && player.y+player.h-player.vy*globalTimeScale <= e.y + e.h*0.5) {
-                player.vy = -6; 
-                ammo = MAX_AMMO; 
-                updateUI(); 
-                killEnemy(e, idx);
-            } else if(player.iframes <= 0) {
-                hp--;
-                player.iframes = 60;
-                player.vy = -5;
-                shake = 10;
-                updateUI();
-                if(hp <= 0) gameOver();
-            }
-        }
-    });
-
-    // 7. PLAYER vs DIAMONDS (Contact collection)
-    for(let i=gems.length-1; i>=0; i--) {
-        let g = gems[i];
-        if(rectCol(player.x, player.y, player.w, player.h, g.x, g.y, g.w, g.h)) {
-            collectDiamond(i);
-        }
-    }
-
-    // 8. Cleanup & Gen
-    platforms = platforms.filter(p => p.y > cameraY - 50);
-    enemies = enemies.filter(e => e.y > cameraY - 50);
-    gems = gems.filter(g => g.y > cameraY - 50);
-    generateLevel(cameraY + INTERNAL_H + 200);
-
-    // 9. Score
-    let depth = Math.floor(player.y/10);
-    if(depth > score) { 
-        score = depth; 
-        document.getElementById('depth').innerText = score; 
-    }
-
-    // 10. Particles & Texts (with time scale)
-    particles.forEach((p,i) => {
-        p.x += p.vx * globalTimeScale; 
-        p.y += p.vy * globalTimeScale; 
-        p.life--;
-        if(p.life<=0) particles.splice(i,1);
-    });
-    texts.forEach((t,i) => {
-        t.y -= 1 * globalTimeScale; 
-        t.life--;
-        if(t.life<=0) texts.splice(i,1);
-    });
 
     frame++;
     render();
@@ -674,51 +500,44 @@ function render() {
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     
     ctx.fillStyle = '#050505';
-    ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H); 
+    ctx.fillRect(0,0,INTERNAL_W, INTERNAL_H); 
 
-    // Shake
+    ctx.save();
     let sx = (Math.random()-0.5)*shake;
     let sy = (Math.random()-0.5)*shake;
     ctx.translate(sx, sy - cameraY + 100);
 
     // Platforms
-    ctx.fillStyle = '#fff';
     platforms.forEach(p => {
+        ctx.fillStyle = '#fff';
         ctx.fillRect(p.x, p.y, p.w, p.h);
         ctx.fillStyle = '#ff0055'; 
-        ctx.fillRect(p.x, p.y, p.w, 2); 
-        ctx.fillStyle='#fff';
+        ctx.fillRect(p.x, p.y, p.w, 2);
     });
 
-    // Gems with pulsing effect
+    // Gems
     gems.forEach(g => {
-        let pulse = Math.sin(frame * 0.1) * 0.2 + 0.8;
-        ctx.save();
-        ctx.translate(g.x + g.w/2, g.y + g.h/2);
-        ctx.scale(pulse, pulse);
         ctx.fillStyle = '#00f3ff';
         ctx.beginPath();
-        ctx.moveTo(0, -g.h/2);
-        ctx.lineTo(g.w/2, 0);
-        ctx.lineTo(0, g.h/2);
-        ctx.lineTo(-g.w/2, 0);
+        ctx.moveTo(g.x + g.w/2, g.y);
+        ctx.lineTo(g.x + g.w, g.y + g.h/2);
+        ctx.lineTo(g.x + g.w/2, g.y + g.h);
+        ctx.lineTo(g.x, g.y + g.h/2);
         ctx.fill();
-        ctx.shadowBlur = 15; 
-        ctx.shadowColor = '#00f3ff';
-        ctx.fill(); 
-        ctx.shadowBlur = 0;
-        ctx.restore();
+        ctx.shadowBlur = 10; ctx.shadowColor = '#00f3ff';
+        ctx.fill(); ctx.shadowBlur = 0;
     });
 
-    // Enemies with animation
+    // Enemies
     enemies.forEach(e => {
-        ctx.fillStyle = e.type==='block' ? '#ff0055' : (e.type==='floater' ? '#ffaa00' : '#ff5500');
+        ctx.fillStyle = e.type==='block' ? '#ff0055' : '#ffaa00';
         ctx.fillRect(e.x, e.y, e.w, e.h);
         ctx.fillStyle = '#fff';
-        // Animated eyes
-        let eyeOffset = Math.sin(frame * 0.1) * 2;
-        ctx.fillRect(e.x+5, e.y+5+eyeOffset, 4, 4); 
-        ctx.fillRect(e.x+e.w-9, e.y+5+eyeOffset, 4, 4);
+        ctx.fillRect(e.x+5, e.y+5, 4, 4); 
+        ctx.fillRect(e.x+e.w-9, e.y+5, 4, 4);
+        // Add a small "heart" or detail to make them look more like game enemies
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillRect(e.x, e.y + e.h - 4, e.w, 4);
     });
 
     // Bullets
@@ -729,149 +548,96 @@ function render() {
     if(player.iframes%4 < 2) {
         ctx.save();
         ctx.translate(player.x + player.w/2, player.y + player.h/2);
-        let sy = 1 + Math.abs(player.vy)*0.05; 
-        ctx.scale(1/sy, sy);
-        ctx.fillStyle = '#fff'; 
-        ctx.fillRect(-8, -12, 16, 24);
-        ctx.fillStyle = '#ff0055'; 
-        ctx.fillRect(-6, -8, 12, 4);
+        let sy = 1 + Math.abs(player.vy)*0.05; ctx.scale(1/sy, sy);
+        ctx.fillStyle = '#fff'; ctx.fillRect(-8, -12, 16, 24);
+        ctx.fillStyle = '#ff0055'; ctx.fillRect(-6, -8, 12, 4);
         ctx.fillStyle = '#000';
         if(keys.left) ctx.fillRect(-6, -6, 2, 4);
         else if(keys.right) ctx.fillRect(4, -6, 2, 4);
-        else { 
-            ctx.fillRect(-4, -6, 2, 4); 
-            ctx.fillRect(2, -6, 2, 4); 
-        }
+        else { ctx.fillRect(-4, -6, 2, 4); ctx.fillRect(2, -6, 2, 4); }
         ctx.restore();
     }
 
-    // Particles
-    particles.forEach(p => { 
-        ctx.fillStyle = p.c; 
-        ctx.fillRect(p.x, p.y, 4, 4); 
-    });
-    
-    // Text
+    // Particles & Text
+    particles.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 4, 4); });
     ctx.font = '10px "Press Start 2P"';
-    ctx.fillStyle = '#fff'; 
-    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
     texts.forEach(t => ctx.fillText(t.str, t.x, t.y));
+
+    ctx.restore();
 }
 
-/** 
- * LEVEL GENERATION 
- */
-let lastY = 200;
 function generateLevel(targetY) {
     while(lastY < targetY) {
-        lastY += 50 + Math.random()*40;
+        lastY += 60 + Math.random()*40;
         let r = Math.random();
         
-        // 15% Chance for Diamond (increased from 10%)
+        // Diamond Spawn
         if(Math.random() < 0.15) {
              let x = Math.random()*(INTERNAL_W-20);
-             gems.push({x, y: lastY - 30, w: 15, h: 15});
+             gems.push({x, y: lastY - 40, w: 16, h: 16});
         }
 
-        if(r < 0.6) {
-            // Platform
-            let w = 50 + Math.random()*60;
+        if(r < 0.7) {
+            let w = 60 + Math.random()*50;
             let x = Math.random()*(INTERNAL_W-w);
             platforms.push({x, y: lastY, w, h: 10});
             
-            // 60% chance for enemy on platform
-            if(Math.random() > 0.4) {
-                let enemyType = Math.random();
-                let eType = enemyType > 0.66 ? 'walker' : (enemyType > 0.33 ? 'floater' : 'block');
+            // Enemy on platform
+            if(Math.random()>0.4) {
                 enemies.push({
-                    x: x+10, 
-                    y: lastY-25, 
-                    w: 20, 
-                    h: 20, 
-                    hp: 1, 
-                    type: eType,
-                    startX: x+10,
-                    direction: 1
+                    x: x + w/2 - 10, y: lastY-25, w: 20, h: 20, hp: 1, 
+                    type: Math.random()>0.5 ? 'walker' : 'floater',
+                    startX: x + w/2 - 10,
+                    offset: Math.random() * Math.PI * 2
                 });
             }
         } else {
-            // Floating enemy
             let x = Math.random()*(INTERNAL_W-30);
-            enemies.push({
-                x, 
-                y: lastY, 
-                w: 30, 
-                h: 30, 
-                hp: 3, 
-                type: 'block',
-                startY: lastY
-            });
+            enemies.push({x, y: lastY, w: 30, h: 30, hp: 3, type: 'block', offset: Math.random() * Math.PI * 2});
         }
     }
 }
 
-/** 
- * GAME EVENTS 
- */
-const words = ["WOW!", "NICE!", "EPIC!", "GREAT!", "BOOM!", "COOL!", "YEAH!"];
+const words = ["WOW!", "NICE!", "EPIC!", "GREAT!", "BOOM!", "COOL!", "LOVELY!"];
 
 function killEnemy(e, idx) {
     enemies.splice(idx, 1);
     shake = 6;
     spawnText(e.x, e.y);
-    for(let i=0; i<8; i++) spawnParticle(e.x+e.w/2, e.y+e.h/2, '#ff0055');
+    for(let i=0; i<10; i++) spawnParticle(e.x+e.w/2, e.y+e.h/2, '#ff0055');
 }
 
 function collectDiamond(idx) {
     gems.splice(idx, 1);
     diamonds++;
-    
-    // Quote UI activation
     isQuoteActive = true;
     
-    // Get Random Quote
     const note = LOVE_DB[Math.floor(Math.random() * LOVE_DB.length)];
     const ui = document.getElementById('floating-quote-container');
     const text = document.getElementById('floating-quote-text');
     
     text.innerText = note;
     ui.style.opacity = 1;
+    ui.style.transform = 'scale(1)';
     
     if(window.quoteTimeout) clearTimeout(window.quoteTimeout);
-    
     window.quoteTimeout = setTimeout(() => {
         ui.style.opacity = 0;
+        ui.style.transform = 'scale(0.8)';
         isQuoteActive = false;
     }, 2000);
 
-    shake = 8;
-    for(let i=0; i<12; i++) spawnParticle(player.x+8, player.y+12, '#00f3ff');
-    
     updateUI();
-    
-    if(diamonds >= WIN_SCORE) {
-        setTimeout(winGame, 2500); 
-    }
+    if(diamonds >= WIN_SCORE) winGame();
 }
 
 function spawnText(x, y) {
-    texts.push({
-        x, 
-        y, 
-        str: words[Math.floor(Math.random()*words.length)], 
-        life: 40
-    });
+    texts.push({x, y, str: words[Math.floor(Math.random()*words.length)], life: 40});
 }
 
 function spawnParticle(x, y, c) {
-    particles.push({
-        x, 
-        y, 
-        vx: (Math.random()-0.5)*8, 
-        vy: (Math.random()-0.5)*8, 
-        life: 20, 
-        c
-    });
+    particles.push({x, y, vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8, life: 25, c});
 }
 
 function rectCol(x1,y1,w1,h1, x2,y2,w2,h2) {
@@ -879,8 +645,7 @@ function rectCol(x1,y1,w1,h1, x2,y2,w2,h2) {
 }
 
 function updateUI() {
-    let h = ""; 
-    for(let i=0; i<hp; i++) h+="❤";
+    let h = ""; for(let i=0; i<hp; i++) h+="❤";
     document.getElementById('hp').innerText = h;
     document.getElementById('ammo-fill').style.width = `${(ammo/MAX_AMMO)*100}%`;
     document.getElementById('gems').innerText = diamonds;
@@ -889,7 +654,8 @@ function updateUI() {
 function winGame() {
     gameState = 'WIN';
     document.getElementById('win-screen').classList.remove('hidden');
-    document.getElementById('floating-quote-container').style.opacity = 0;
+    document.getElementById('floating-quote-container').style.display = 'none';
+    document.getElementById('final-quote').innerText = LOVE_DB[Math.floor(Math.random() * LOVE_DB.length)];
 }
 
 function gameOver() {
@@ -899,67 +665,52 @@ function gameOver() {
     document.getElementById('start-btn').innerText = "TRY AGAIN";
 }
 
-// Keyboard Controls
+// Controls
 window.addEventListener('keydown', e => {
     if(e.code==='ArrowLeft' || e.code==='KeyA') keys.left=true;
     if(e.code==='ArrowRight' || e.code==='KeyD') keys.right=true;
-    if(e.code==='Space' || e.code==='KeyW' || e.code==='ArrowUp') {
+    if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') {
         if(gameState==='MENU') { 
             document.getElementById('start-screen').style.display='none'; 
-            document.getElementById('mobile-controls').style.display='block';
-            Music.play().catch(e => console.log('Audio blocked:', e)); 
-            reset(); 
-            update(); 
+            Music.play().catch(e => console.log("Audio play blocked"));
+            reset();
         }
         keys.shoot=true;
     }
 });
-
 window.addEventListener('keyup', e => {
     if(e.code==='ArrowLeft' || e.code==='KeyA') keys.left=false;
     if(e.code==='ArrowRight' || e.code==='KeyD') keys.right=false;
-    if(e.code==='Space' || e.code==='KeyW' || e.code==='ArrowUp') keys.shoot=false;
+    if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') keys.shoot=false;
 });
 
-// Touch Controls
-const touchStart = (key) => (e) => { 
-    e.preventDefault(); 
-    keys[key] = true; 
-};
-const touchEnd = (key) => (e) => { 
-    e.preventDefault(); 
-    keys[key] = false; 
-};
-
+// Touch
+const touchStart = (key) => (e) => { e.preventDefault(); keys[key] = true; };
+const touchEnd = (key) => (e) => { e.preventDefault(); keys[key] = false; };
 document.getElementById('zone-left').addEventListener('touchstart', touchStart('left'));
 document.getElementById('zone-left').addEventListener('touchend', touchEnd('left'));
 document.getElementById('zone-right').addEventListener('touchstart', touchStart('right'));
 document.getElementById('zone-right').addEventListener('touchend', touchEnd('right'));
 document.getElementById('zone-fire').addEventListener('touchstart', (e) => { 
     e.preventDefault(); 
+    if(gameState==='MENU') {
+        document.getElementById('start-screen').style.display='none'; 
+        Music.play().catch(e => console.log("Audio play blocked"));
+        reset();
+    }
     keys.shoot=true; 
 });
-document.getElementById('zone-fire').addEventListener('touchend', (e) => { 
-    e.preventDefault(); 
-    keys.shoot=false; 
-});
+document.getElementById('zone-fire').addEventListener('touchend', (e) => { e.preventDefault(); keys.shoot=false; });
 
-// Start Button
 document.getElementById('start-btn').addEventListener('click', () => {
     document.getElementById('start-screen').style.display='none';
     document.getElementById('mobile-controls').style.display='block';
-    Music.play().catch(e => console.log('Audio blocked:', e));
+    Music.play().catch(e => console.log("Audio play blocked"));
     reset();
-    update();
 });
 
-// Restart Button
-document.getElementById('restart-btn').addEventListener('click', () => {
-    document.getElementById('win-screen').classList.add('hidden');
-    document.getElementById('mobile-controls').style.display='block';
-    reset();
-    update();
-});
+// Start loop
+update();
 
 </script>
 </body>
